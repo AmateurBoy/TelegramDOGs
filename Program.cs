@@ -8,56 +8,89 @@ using Telegram.Bot.Exceptions;
 using System.Collections.Generic;
 using System.Data;
 using MySql.Data.MySqlClient;
+using Telegram.Bot.Types.ReplyMarkups;
+using System.Diagnostics;
+using ConsoleTestGI;
 
 namespace TelegramDOGs
 {
     class Program
     {
-            
+
+            public static ProccesAPI proccesAPI = ProccesAPI.GetProccesAPI();
+            public static bool ButtonActiv = false;
             static ITelegramBotClient bot = new TelegramBotClient("5384438845:AAG6qrDzwcni1Lk8bBIkXAPCJ2-D7YVG6j0");
             
             public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
             {
                 // Некоторые действия
                 Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(update));
+                
                 if (update.Type == Telegram.Bot.Types.Enums.UpdateType.Message)
                 {
-                   
                     var message = update.Message;
+                if(ButtonActiv==false)
+                {
                     
+                    await botClient.SendTextMessageAsync(message.Chat.Id, "Кнопки активейт", replyMarkup: GetButton());
+                    ButtonActiv = true;
+                }
+                    
+                    if(message.Text != null)
+                    {
                     if (message.Text.ToLower() == "/start")
                     {
-                        
-                        
+
+
                         await botClient.SendTextMessageAsync(message.Chat, "Добро пожаловать на борт, добрый путник!");
                         return;
                     }
-                    else if(message.Text.ToLower() == "/status")
+                    else if (message.Text.ToLower() == "/status")
                     {
-                        
+
                         await botClient.SendTextMessageAsync(message.Chat, $"{DB_Status(message)}");
                     }
-                    else if(message.Text.ToLower() == "/reg")
+                    else if (message.Text.ToLower() == "/reg")
                     {
                         await botClient.SendTextMessageAsync(message.Chat, $"{Add_DB_Test(message)}");
-                        
+
                     }
                     else
                     {
                         await botClient.SendTextMessageAsync(message.Chat, $" ID:{message.Chat.Id} UserName: {message.Chat.FirstName} text: {message.Text}");
 
                     }
+                }
+                    if(message.Photo != null)
+                    {
+                    
+                        await botClient.SendTextMessageAsync(message.Chat.Id, "Фотка зачёт");
+                    }
+                    
 
-
-
-            }
+                }
+                
                 if(update.Type==Telegram.Bot.Types.Enums.UpdateType.EditedMessage)
                 {
                     var edited_message = update.EditedMessage;
                     await botClient.SendTextMessageAsync(edited_message.Chat, "Опа кто то изменил сообщение извени я такое не понимаю...");
                 }
             }
-            public static async Task AdminMessage(ITelegramBotClient botClient)
+
+        private static IReplyMarkup GetButton()
+        {
+            List<List<KeyboardButton>> KeyboardButtonTest = new List<List<KeyboardButton>>();
+            KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("Найти собаку"),new KeyboardButton("/status")});
+            KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("Купить собаку"), new KeyboardButton("Бой") });
+
+
+            var keybord = new ReplyKeyboardMarkup(KeyboardButtonTest);
+
+            
+            return keybord;
+        }
+
+        public static async Task AdminMessage(ITelegramBotClient botClient)
             {
                 Console.WriteLine("Введите ID Пользователя:");
                 long ID = long.Parse(Console.ReadLine());
@@ -127,6 +160,26 @@ namespace TelegramDOGs
             
             
         }
+            /*public static void Status_Server()
+            {
+                proccesAPI.StatusServer();
+
+
+                
+                foreach (Process process in Process.GetProcesses())
+                {
+
+                
+                    if (process.ProcessName == "MAMP")
+                {
+                    process.Kill();
+                }
+                    */
+            
+            
+
+
+        
             public static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
             {
                 // Некоторые действия
@@ -135,7 +188,7 @@ namespace TelegramDOGs
         static void Main(string[] args)
         {
                 Console.WriteLine("Запущен бот " + bot.GetMeAsync().Result.FirstName);
-
+                
                 var cts = new CancellationTokenSource();
                 var cancellationToken = cts.Token;
                 var receiverOptions = new ReceiverOptions
@@ -163,10 +216,19 @@ namespace TelegramDOGs
                 }
                 if(key.Key == ConsoleKey.Home)
                 {
-                    Console.WriteLine("Сервер закрыт завершение Администратором");
+                    proccesAPI.StatusServer();                    
+                } 
+                if(key.Key == ConsoleKey.PageUp)
+                {
+                    proccesAPI.StopServer();
+                    Console.WriteLine("Отключение TelegramBot");
                     ServerActiv = false;
                     break;
-                }    
+                }
+                if(key.Key == ConsoleKey.PageDown)
+                {
+                    proccesAPI.StopServer();
+                }
             }
                
                 
