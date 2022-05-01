@@ -105,13 +105,23 @@ namespace TelegramDOGs
             DataTable table = new DataTable();
             MySqlDataAdapter adapter = new MySqlDataAdapter();
             MySqlCommand Command = new MySqlCommand("SELECT * FROM `users` WHERE `id` = @ID",DB.GetConnection());
+            
             Command.Parameters.Add("@ID",MySqlDbType.Int32).Value=ID;
             adapter.SelectCommand = Command;
+            
             adapter.Fill(table);
             if(table.Rows.Count>0)
             {
-                Console.WriteLine($"Найден пользователь ID: {ID}");
-                string t = $"Найден пользователь ID: {ID}";
+                string t = $"";
+
+                foreach (DataRow item in table.Rows)
+                {
+                    var Test = item.ItemArray;
+                    t = Convert.ToString($"Ваше имя: {Test[1]}\nУ вас собак: {Test[2]}");
+                    Console.WriteLine($"Ваше имя: {Test[1]}\nУ вас собак: {Test[2]}");
+                }
+                
+                
                 return t;
             }
             else
@@ -160,40 +170,27 @@ namespace TelegramDOGs
             
             
         }
-            /*public static void Status_Server()
-            {
-                proccesAPI.StatusServer();
-
-
-                
-                foreach (Process process in Process.GetProcesses())
-                {
-
-                
-                    if (process.ProcessName == "MAMP")
-                {
-                    process.Kill();
-                }
-                    */
-            
+          
             
 
 
         
             public static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
             {
-                // Некоторые действия
+                
                  Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(exception));
             }
         static void Main(string[] args)
         {
+                proccesAPI.StartServer();
+                
                 Console.WriteLine("Запущен бот " + bot.GetMeAsync().Result.FirstName);
                 
                 var cts = new CancellationTokenSource();
                 var cancellationToken = cts.Token;
                 var receiverOptions = new ReceiverOptions
                 {
-                    AllowedUpdates = { }, // receive all update types
+                    AllowedUpdates = { }, 
                 };
                 bot.StartReceiving(
                     HandleUpdateAsync,

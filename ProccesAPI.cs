@@ -21,6 +21,9 @@ namespace ConsoleTestGI
         {
              if(process == null)
             process = Process.Start(@"C:\MAMP\MAMP.exe");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Запущен процесс Сервера");
+            Console.ForegroundColor = ConsoleColor.White;
         }
         public void StopServer()
         {
