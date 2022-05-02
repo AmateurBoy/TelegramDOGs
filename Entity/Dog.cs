@@ -12,7 +12,7 @@ namespace TelegramDOGs
     {
         
         Random R = new Random();
-        
+        public int UserId { get; private set; }
         public int id { get; private set; }
         public string name { get; private set; }
         public byte age { get; private set; }
