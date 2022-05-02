@@ -17,11 +17,11 @@ namespace TelegramDOGs
     class Program
     {
 
-            public static ProccesAPI proccesAPI = ProccesAPI.GetProccesAPI();
-            public static bool ButtonActiv = false;
-            static ITelegramBotClient bot = new TelegramBotClient("5384438845:AAG6qrDzwcni1Lk8bBIkXAPCJ2-D7YVG6j0");
+         public static ProccesAPI proccesAPI = ProccesAPI.GetProccesAPI();
+         public static bool ButtonActiv = false;
+         static ITelegramBotClient bot = new TelegramBotClient("5384438845:AAG6qrDzwcni1Lk8bBIkXAPCJ2-D7YVG6j0");
             
-            public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+        public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
             {
                 // Некоторые действия
                 Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(update));
@@ -98,7 +98,7 @@ namespace TelegramDOGs
                 string Text = Console.ReadLine();
                 await botClient.SendTextMessageAsync(ID,Text);
             }
-            public static string DB_Status(Message message)
+        public static string DB_Status(Message message)
         {
             int ID =Convert.ToInt32(message.Chat.Id);
             DataBase DB = new DataBase();
@@ -117,8 +117,8 @@ namespace TelegramDOGs
                 foreach (DataRow item in table.Rows)
                 {
                     var Test = item.ItemArray;
-                    t = Convert.ToString($"Ваше имя: {Test[1]}\nУ вас собак: {Test[2]}");
-                    Console.WriteLine($"Ваше имя: {Test[1]}\nУ вас собак: {Test[2]}");
+                    t = $"Ваше имя: {Test[1]}\nУ вас собак: {Test[2]}\nMoney:{Test[3]}";
+                        Console.WriteLine($"Ваше имя: {Test[1]}\nУ вас собак: {Test[2]}\nMoney: {Test[3]}");
                 }
                 
                 
@@ -130,7 +130,7 @@ namespace TelegramDOGs
                 return "Не найдено";
             }    
         }
-            public static bool isCreate(string DB_status)
+        public static bool isCreate(string DB_status)
             {
                 if(DB_status== "Не найдено")
                 {
@@ -141,7 +141,7 @@ namespace TelegramDOGs
                     return false;
                 }
             }
-            public static string Add_DB_Test(Message message)
+        public static string Add_DB_Test(Message message)
         {
             if(isCreate(DB_Status(message)))
             {
@@ -171,11 +171,7 @@ namespace TelegramDOGs
             
         }
           
-            
-
-
-        
-            public static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
+        public static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
             {
                 
                  Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(exception));
