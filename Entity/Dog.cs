@@ -12,31 +12,36 @@ namespace TelegramDOGs
     {
         
         Random R = new Random();
-        public int UserId { get; private set; }
-        public int id { get; private set; }
-        public string name { get; private set; }
-        public byte age { get; private set; }
-       
-        public byte lvl { get; private set;}
+        public int UserId { get;  set; }
+        public int id { get;  set; }
+        public string name { get;  set; }
+        public int age { get;  set; }
+        public int HP { get; set; }
+        public int lvl { get;  set;}
         
-        public int satiety { get; private set; }
-        public string TypeDogString { get; private set; }
-        public byte TypeDog { get; private set; }
-        public byte Endurance { get; private set; }
-        public byte Agility { get; private set; }
-        public byte Intelligence { get; private set; }
-        public Dog(int id, string name, byte age, byte lvl , int satiety)
+        public int satiety { get;  set; }
+        public string TypeDogString { get;  set; }
+        public int TypeDog { get;  set; }
+        public int Endurance { get;  set; }
+        public int Agility { get;  set; }
+        public int Intelligence { get;  set; }
+        public Dog(int id, string name, int age, int lvl , int satiety)
         {
             this.id = id;
             this.name = name;
             this.age = age;
             this.lvl = lvl;
             this.satiety = satiety;
+            SetTypeDogRandom();
+        }
+        public Dog()
+        {
+
         }
 
         public void SetTypeDogRandom()
         {
-            TypeDogString = Convert.ToString((TypeDogs)R.Next(0,1));
+            TypeDogString = Convert.ToString((TypeDogs)R.Next(0,2));
         }
         public void LvlUp()
         {

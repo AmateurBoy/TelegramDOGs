@@ -11,15 +11,19 @@ using MySql.Data.MySqlClient;
 using Telegram.Bot.Types.ReplyMarkups;
 using System.Diagnostics;
 using ConsoleTestGI;
+using TelegramDOGs.DAO;
+using TelegramDOGs.Service;
 
 namespace TelegramDOGs
 {
     class Program
     {
 
-         public static ProccesAPI proccesAPI = ProccesAPI.GetProccesAPI();
-         public static bool ButtonActiv = false;
-         static ITelegramBotClient bot = new TelegramBotClient("5384438845:AAG6qrDzwcni1Lk8bBIkXAPCJ2-D7YVG6j0");
+        public static ProccesAPI proccesAPI = ProccesAPI.GetProccesAPI();
+        public static UserDAO userDAO = UserDAO.GetInstens();
+        public static DogDAO dogDAO = DogDAO.GetInstens();
+        public static bool ButtonActiv = false;
+        static ITelegramBotClient bot = new TelegramBotClient("5384438845:AAG6qrDzwcni1Lk8bBIkXAPCJ2-D7YVG6j0");
             
         public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
             {
@@ -38,21 +42,27 @@ namespace TelegramDOGs
                     
                     if(message.Text != null)
                     {
+                    
                     if (message.Text.ToLower() == "/start")
                     {
 
 
                         await botClient.SendTextMessageAsync(message.Chat, "Добро пожаловать на борт, добрый путник!");
+                        await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.CreateNewUser(userDAO.CreateNewUser((int)message.Chat.Id, message.Chat.FirstName))}");
                         return;
+                    }
+                    else if (Equals( message.Text.ToLower(), "/finddog"))
+                    {
+                        await botClient.SendTextMessageAsync(message.Chat, $"{dogDAO.CreatDogRandom((int)message.Chat.Id)}");
                     }
                     else if (message.Text.ToLower() == "/status")
                     {
 
-                        await botClient.SendTextMessageAsync(message.Chat, $"{DB_Status(message)}");
+                        await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.GetUserByID((int)message.Chat.Id).GetAllStatus()}");
                     }
                     else if (message.Text.ToLower() == "/reg")
                     {
-                        await botClient.SendTextMessageAsync(message.Chat, $"{Add_DB_Test(message)}");
+                        await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.CreateNewUser(userDAO.CreateNewUser((int)message.Chat.Id, message.Chat.FirstName))}");
 
                     }
                     else
@@ -80,7 +90,7 @@ namespace TelegramDOGs
         private static IReplyMarkup GetButton()
         {
             List<List<KeyboardButton>> KeyboardButtonTest = new List<List<KeyboardButton>>();
-            KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("Найти собаку"),new KeyboardButton("/status")});
+            KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("/finddog"),new KeyboardButton("/status")});
             KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("Купить собаку"), new KeyboardButton("Бой") });
 
 
