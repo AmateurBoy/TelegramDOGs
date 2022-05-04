@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace TelegramDOGs
 {
-    enum TypeDogs { LabradorRetrievers, GermanShepherds };
+    enum TypeDogs { LabradorRetrievers, GermanShepherds, Bulldogs,Mops, Poodles, Rottweilers, GoldenRetrievers, };
     
     class Dog
     {
@@ -16,15 +16,17 @@ namespace TelegramDOGs
         public int id { get;  set; }
         public string name { get;  set; }
         public int age { get;  set; }
+        public DateTime RegDogUser { get; set; }
         public int HP { get; set; }
         public int lvl { get;  set;}
-        
+        public double multiplier { get; set; }
         public int satiety { get;  set; }
         public string TypeDogString { get;  set; }
         public int TypeDog { get;  set; }
         public int Endurance { get;  set; }
         public int Agility { get;  set; }
         public int Intelligence { get;  set; }
+        
         public Dog(int id, string name, int age, int lvl , int satiety)
         {
             this.id = id;
@@ -32,16 +34,31 @@ namespace TelegramDOGs
             this.age = age;
             this.lvl = lvl;
             this.satiety = satiety;
+            this.Intelligence = 50;
             SetTypeDogRandom();
+            Updatedog();
+            
+            
         }
         public Dog()
         {
-
+            this.Intelligence = 50;
+            SetTypeDogRandom();
+            Updatedog();
+            
         }
 
         public void SetTypeDogRandom()
         {
-            TypeDogString = Convert.ToString((TypeDogs)R.Next(0,2));
+            TypeDogString = Convert.ToString((TypeDogs)R.Next(0,6));
+        }
+        public void SetTypeDog(TypeDogs e)
+        {
+            this.TypeDogString = Convert.ToString(e);
+        }
+        public int CountFreeLvL()
+        {
+            return lvl - (Endurance + Agility + Intelligence);
         }
         public void LvlUp()
         {
@@ -78,6 +95,10 @@ namespace TelegramDOGs
             {
                 Intelligence += 1;
             }
+        }
+        public void Updatedog()
+        {
+            multiplier = 0.001 * Intelligence;
         }
 
     }

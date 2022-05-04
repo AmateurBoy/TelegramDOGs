@@ -23,14 +23,7 @@ namespace TelegramDOGs.Service
             }
             return Instens;
         }
-        public void Temp()
-        {
-            using(UserDAO userDAO = UserDAO.GetInstens())
-            {
-
-            }
-        }
-
+        
         public static string DB_Status(Message message)
         {
             int ID = Convert.ToInt32(message.Chat.Id);
@@ -74,9 +67,34 @@ namespace TelegramDOGs.Service
                 return false;
             }
         }
-        public string Add_DB_Test(Message message)
+        public static string Add_DB_Test(Message message)
         {
-            return "Я случайно удалил :(";
+            if (isCreate(DB_Status(message)))
+            {
+                DataBase DB = new DataBase();
+
+                MySqlCommand Command = new MySqlCommand($"INSERT INTO `users` (`id`, `name`, `countDogs`) VALUES (@ID, @UserName, @CountDogs)", DB.GetConnection());
+                Command.Parameters.Add("@ID", MySqlDbType.Int32).Value = Convert.ToInt32(message.Chat.Id);
+                Command.Parameters.Add("@UserName", MySqlDbType.VarChar).Value = message.Chat.FirstName;
+                Command.Parameters.Add("@CountDogs", MySqlDbType.Int32).Value = 0;
+                DB.OpenConnection();
+                if (Command.ExecuteNonQuery() == 1)
+                {
+                    Console.WriteLine("Регестрация успешна");
+                }
+                else
+                {
+
+                }
+                DB.CloseConnection();
+                return "Акаунт зарегестрирован.";
+            }
+            else
+            {
+                return "Акаунт уже есть...";
+            }
+
+
         }
     }
 }

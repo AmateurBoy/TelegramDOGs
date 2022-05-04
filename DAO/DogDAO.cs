@@ -5,6 +5,7 @@ using System.Text;
 using TelegramDOGs.Entity;
 using System.Data;
 
+
 namespace TelegramDOGs
 {
    
@@ -39,7 +40,10 @@ namespace TelegramDOGs
             {
                 MySqlDataAdapter adapter = new MySqlDataAdapter();
                 Dog dog = new Dog(R.Next(0,999999), "ДворнягаСимпатяга", (byte)R.Next(0, 85), (byte)R.Next(0, 10), R.Next(3, 25));
-                MySqlCommand command = new MySqlCommand($"INSERT INTO `dogs`(`id`,`age`, `name`, `typedog`, `satiety`, `hp`, `lvl`, `Endurance`, `Agility`, `Intelligence`, `userid`) VALUES ('{dog.id}','{dog.age}','{dog.name}','{dog.TypeDogString}','{dog.satiety}','{dog.HP}','{dog.lvl}','{dog.Endurance}','{dog.Agility}','{dog.Intelligence}','{UserId}')", DB.GetConnection());
+                
+                MySqlCommand command = new MySqlCommand($"INSERT INTO `dogs`(`id`,`age`, `name`, `typedog`, `satiety`, `hp`, `lvl`, `Endurance`, `Agility`, `Intelligence`, `userid`, `multiplier`,`regDoguser`) VALUES ('{dog.id}','{dog.age}','{dog.name}','{dog.TypeDogString}','{dog.satiety}','{dog.HP}','{dog.lvl}','{dog.Endurance}','{dog.Agility}','{dog.Intelligence}','{UserId}',@multiplier,@DataUpdate)", DB.GetConnection());
+                command.Parameters.Add("@DataUpdate", MySqlDbType.Date).Value = DateTime.Now;
+                command.Parameters.Add("@multiplier", MySqlDbType.Double).Value = dog.multiplier;
                 adapter.SelectCommand = command;
                 if(command.ExecuteNonQuery() == 1)
                 { }    
@@ -50,7 +54,7 @@ namespace TelegramDOGs
 
 
         }
-        public List<Dog> GetDogs(int userId)
+        public List<Dog> GetAllDogsUsers(int userId)
         {
             MySqlDataAdapter adapter = new MySqlDataAdapter();
             DataTable table = new DataTable();
@@ -60,11 +64,25 @@ namespace TelegramDOGs
             List<Dog> Dogs = new List<Dog>();
             foreach (DataRow item in table.Rows)
             {
-                Dogs.Add(Convertor(item.ItemArray));
+                Dogs.Add(IncealizatorDog(item.ItemArray));
             }
             return Dogs;
         }
-        public Dog Convertor(object[] obj)
+        public Dog GetDog(int idDog)
+        {
+            MySqlDataAdapter adapter = new MySqlDataAdapter();
+            DataTable table = new DataTable();
+            MySqlCommand command = new MySqlCommand($"SELECT * FROM `dogs` WHERE `id`={idDog}", DB.GetConnection());
+            adapter.SelectCommand = command;
+            adapter.Fill(table);
+            Dog dog = new Dog();
+            foreach (DataRow item in table.Rows)
+            {
+                dog = IncealizatorDog(item.ItemArray);
+            }
+            return dog;
+        }
+        public Dog IncealizatorDog(object[] obj)
         {
             Dog dog = new Dog();
             dog.id = (int)obj[0];
@@ -78,6 +96,8 @@ namespace TelegramDOGs
             dog.Agility = (int)obj[8];
             dog.Intelligence = (int)obj[9];
             dog.UserId = (int)obj[10];
+            dog.multiplier = (double)obj[11];
+            dog.RegDogUser = (DateTime)obj[12];
             return dog;
         }
     }
