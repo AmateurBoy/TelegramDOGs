@@ -29,14 +29,17 @@ namespace TelegramDOGs
             
         public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
             {
+                
                 // Некоторые действия
                 Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(update));
                 
                 if (update.Type == Telegram.Bot.Types.Enums.UpdateType.Message)
                 {
                     var message = update.Message;
-                if(ButtonActiv==false)
+                    userDAO.UpdateUser(userDAO.GetUserByID((int)message.Chat.Id));
+                if (ButtonActiv==false)
                 {
+                   
                     
                     await botClient.SendTextMessageAsync(message.Chat.Id, "Кнопки активейт", replyMarkup: GetButton());
                     ButtonActiv = true;
@@ -55,6 +58,7 @@ namespace TelegramDOGs
                     }
                     else if (Equals( message.Text.ToLower(), "/finddog"))
                     {
+
                         await botClient.SendTextMessageAsync(message.Chat, $"{dogDAO.CreatDogRandom((int)message.Chat.Id)}");
                         
                     }
@@ -74,7 +78,7 @@ namespace TelegramDOGs
                         await botClient.SendTextMessageAsync(message.Chat, $" ID:{message.Chat.Id} UserName: {message.Chat.FirstName} text: {message.Text}");
 
                     }
-                    userDAO.UpdateUser(userDAO.GetUserByID((int)message.Chat.Id));
+                    
                 }
                     if(message.Photo != null)
                     {

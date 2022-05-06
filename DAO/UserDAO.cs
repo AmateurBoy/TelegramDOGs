@@ -93,10 +93,10 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
                     multsuma += item.multiplier; 
                 }
 
-                double dohod =  multsuma * DateTime.Now.Subtract(user.DataUpdate).Seconds;
-                user.money +=  (multsuma * DateTime.Now.Subtract(user.DataUpdate).Seconds);
+                double dohod =  multsuma * DateTime.Now.Subtract(user.DataUpdate).TotalSeconds;
+                user.money +=  (multsuma * DateTime.Now.Subtract(user.DataUpdate).TotalSeconds);
                 
-                Console.WriteLine($"Dohod {dohod}/{DateTime.Now.Subtract(user.DataUpdate).Seconds}");
+                Console.WriteLine($"Dohod {dohod}/{DateTime.Now.Subtract(user.DataUpdate).TotalSeconds}");
                 
             }        
             string ConvertorSQL()
