@@ -48,6 +48,12 @@ namespace TelegramDOGs
                     if(message.Text != null)
                     {
                     
+                    await botClient.SendTextMessageAsync(message.Chat.Id, "Кнопки активейт", replyMarkup: GetButton());
+                    ButtonActiv = true;
+                }
+                    
+                    if(message.Text != null)
+                    {
                     if (message.Text.ToLower() == "/start")
                     {
 
