@@ -17,7 +17,7 @@ namespace ConsoleTestGI
                 Instance = new ProccesAPI();      
             return Instance;            
         }
-        public void StartServer()
+       public void StartServer()
         {
             Console.WriteLine("Попытка запуска");
             if (process == null)

@@ -5,6 +5,9 @@ using System.Data;
 using System.Text;
 using TelegramDOGs.Entity;
 using MySql.Data;
+using System.Threading;
+
+using ConsoleTestGI;
 
 namespace TelegramDOGs.DAO
 {
@@ -15,8 +18,22 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
     private static UserDAO Instens;
     private UserDAO()
     {
-        DB = new DataBase();
-        DB.OpenConnection();
+        try
+        {
+            DB = new DataBase();
+            DB.OpenConnection();
+        }
+        catch
+        {
+            Console.WriteLine("Создать UserDAO не удалось попытка повториться через 20 секунд...");            
+            ProccesAPI procces = ProccesAPI.GetProccesAPI();
+            procces.StartServer();
+            Thread.Sleep(20000);
+            DB = new DataBase();
+            DB.OpenConnection();
+
+        }
+        
     }
      ~UserDAO()
     {

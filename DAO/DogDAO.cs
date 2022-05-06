@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using System.Text;
 using TelegramDOGs.Entity;
 using System.Data;
-
+using System.Threading;
+using ConsoleTestGI;
 
 namespace TelegramDOGs
 {
@@ -17,8 +18,21 @@ namespace TelegramDOGs
         private static DogDAO Instens;
         private DogDAO()
         {
-            DB = new DataBase();
-            DB.OpenConnection();
+            try
+            {
+                DB = new DataBase();
+                DB.OpenConnection();
+            }
+            catch
+            {
+                Console.WriteLine("Не удалось создать DogDAO отсутсвует подключение к базеданних повторная попытка через 20 секунд...");
+                ProccesAPI procces = ProccesAPI.GetProccesAPI();
+                procces.StartServer();
+                Thread.Sleep(20000);
+                DB = new DataBase();
+                DB.OpenConnection();
+            }
+            
         }
         public void Dispose()
         {
