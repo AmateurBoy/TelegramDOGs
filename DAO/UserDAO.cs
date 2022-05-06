@@ -32,8 +32,7 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
             DB = new DataBase();
             DB.OpenConnection();
 
-        }
-        
+        }        
     }
      ~UserDAO()
     {
@@ -50,9 +49,6 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
     #endregion
     private DataBase DB;
 
-    private Dictionary<int, User> UsersCash = new Dictionary<int, User>();
-    private bool CashValid;
-        
     public User CreateNewUser(int id, string name)
     {
         User user = new User();
@@ -62,7 +58,7 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
     }
     public string CreateNewUser(User user)
     {
-        string result;
+        
         if (IsAcaunt(Convert.ToInt64(user.Id))==false)
         {
             MySqlCommand Command = new MySqlCommand($"INSERT INTO `users` (`id`, `name`, `countDogs`, `money`, `EnergeUser`, `eat`, `rating`, `DateUpdate`) VALUES (@ID, @UserName,@countDogs,@money,@EnergeUser,@Eat,@rating,@DataUpdate)", DB.GetConnection());
@@ -80,16 +76,16 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
 
                 Console.WriteLine("Регестрация успешна");
                 
-                return result = "Регестрация успешна";
+                return "Регестрация успешна";
             }
             else
             {
                 Console.WriteLine("С регестрацией что то не то");
-                return result = "С регестрацией что то не то";
+                return "С регестрацией что то не то";
             }
         }
         else
-            return result = "Акаунт уже зарегестрирован.";
+            return "Акаунт уже зарегестрирован.";
                 
             
             
@@ -116,11 +112,7 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
                 Console.WriteLine($"Dohod {dohod}/{DateTime.Now.Subtract(user.DataUpdate).TotalSeconds}");
                 
             }        
-            string ConvertorSQL()
-            {
-                string S = string.Format("{0:d2}-{1:d2}-{2:d2} {3:d2}:{4:d2}:{5:d2}",DateTime.Now.Year,DateTime.Now.Month,DateTime.Now.Day,DateTime.Now.Hour,DateTime.Now.Minute,DateTime.Now.Second);
-                return S;
-            }
+            
            
             MySqlCommand command = new MySqlCommand($"UPDATE `users` SET `money`=@money,`countDogs`=@countDogs,`DateUpdate`=@DataUpdate WHERE `id`=@id", DB.GetConnection());
             command.Parameters.Add("@DataUpdate", MySqlDbType.DateTime).Value = DateTime.Now;

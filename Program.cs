@@ -32,9 +32,11 @@ namespace TelegramDOGs
             {
                 
                 // Некоторые действия
-                Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(update));
+                //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(update));
+                Console.WriteLine($"Id:{update.Message.Chat.Id} Name:{update.Message.Chat.FirstName} " +
+                    $"\nText:{update.Message.Text}");
                 
-                switch(update.Type)
+                 switch(update.Type)
                 {
                     case Telegram.Bot.Types.Enums.UpdateType.Message:
                     {
@@ -44,17 +46,17 @@ namespace TelegramDOGs
                         {
                             await botClient.SendTextMessageAsync(message.Chat.Id, "Фотка зачёт");
                         }
-                        switch (message.Text.ToLower())
+                        switch (message.Text)
                         {
                             case "/start":
                                 await botClient.SendTextMessageAsync(message.Chat, "*Тут приветствие, а так же правиа игры (Должны быть :))");
                                 await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.CreateNewUser(userDAO.CreateNewUser((int)message.Chat.Id, message.Chat.FirstName))}");
                                 await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.GetUserByID((int)message.Chat.Id).GetAllStatus()}");
                                 break;
-                            case "/status":
+                            case "Мой Профиль":
                                 await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.GetUserByID((int)message.Chat.Id).GetAllStatus()}", replyMarkup: GetButton());
                                 break;
-                            case "/finddog":
+                            case "Найти собаку":
                                 await botClient.SendTextMessageAsync(message.Chat, $"{dogDAO.CreatDogRandom((int)message.Chat.Id)}", replyMarkup: GetButton());
                                 break;
                             case "/reg":
@@ -72,6 +74,10 @@ namespace TelegramDOGs
                         await botClient.SendTextMessageAsync(edited_message.Chat, "Опа кто то изменил сообщение извени я такое не понимаю...");
                         break;
                     }
+                    case Telegram.Bot.Types.Enums.UpdateType.CallbackQuery:
+                    {
+                        break;
+                    }
                 }
                 
             }
@@ -79,9 +85,10 @@ namespace TelegramDOGs
         private static IReplyMarkup GetButton()
         {
             List<List<KeyboardButton>> KeyboardButtonTest = new List<List<KeyboardButton>>();
-            KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("/finddog"),new KeyboardButton("/status")});
+            KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("Найти собаку"),new KeyboardButton("Мой Профиль")});
             KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("Купить собаку"), new KeyboardButton("Бой") });
-            var keybord = new ReplyKeyboardMarkup(KeyboardButtonTest);            
+            var keybord = new ReplyKeyboardMarkup(KeyboardButtonTest);
+            keybord.ResizeKeyboard = true;
             return keybord;
         }
         
@@ -101,6 +108,7 @@ namespace TelegramDOGs
             }
         static void Main(string[] args)
          {
+                proccesAPI.StartServer();      
                 Console.WriteLine("Запущен бот " + bot.GetMeAsync().Result.FirstName);
                 
                 var cts = new CancellationTokenSource();
