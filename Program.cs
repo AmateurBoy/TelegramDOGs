@@ -11,26 +11,42 @@ using MySql.Data.MySqlClient;
 using Telegram.Bot.Types.ReplyMarkups;
 using System.Diagnostics;
 using ConsoleTestGI;
+using TelegramDOGs.DAO;
+using TelegramDOGs.Service;
 
 namespace TelegramDOGs
 {
     class Program
     {
 
-            public static ProccesAPI proccesAPI = ProccesAPI.GetProccesAPI();
-            public static bool ButtonActiv = false;
-            static ITelegramBotClient bot = new TelegramBotClient("5384438845:AAG6qrDzwcni1Lk8bBIkXAPCJ2-D7YVG6j0");
+        public static ProccesAPI proccesAPI = ProccesAPI.GetProccesAPI();
+        public static UserDAO userDAO = UserDAO.GetInstens();
+        public static DogDAO dogDAO = DogDAO.GetInstens();
+        public static DataBase DB = new DataBase();
+
+        public static bool ButtonActiv = false;
+        static ITelegramBotClient bot = new TelegramBotClient("5384438845:AAG6qrDzwcni1Lk8bBIkXAPCJ2-D7YVG6j0");
             
-            public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+        public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
             {
+                
                 // Некоторые действия
                 Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(update));
                 
                 if (update.Type == Telegram.Bot.Types.Enums.UpdateType.Message)
                 {
                     var message = update.Message;
-                if(ButtonActiv==false)
+                    userDAO.UpdateUser(userDAO.GetUserByID((int)message.Chat.Id));
+                if (ButtonActiv==false)
                 {
+                   
+                    
+                    await botClient.SendTextMessageAsync(message.Chat.Id, "Кнопки активейт", replyMarkup: GetButton());
+                    ButtonActiv = true;
+                }
+                    
+                    if(message.Text != null)
+                    {
                     
                     await botClient.SendTextMessageAsync(message.Chat.Id, "Кнопки активейт", replyMarkup: GetButton());
                     ButtonActiv = true;
@@ -43,16 +59,24 @@ namespace TelegramDOGs
 
 
                         await botClient.SendTextMessageAsync(message.Chat, "Добро пожаловать на борт, добрый путник!");
+                        await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.CreateNewUser(userDAO.CreateNewUser((int)message.Chat.Id, message.Chat.FirstName))}");
                         return;
+                    }
+                    else if (Equals( message.Text.ToLower(), "/finddog"))
+                    {
+
+                        await botClient.SendTextMessageAsync(message.Chat, $"{dogDAO.CreatDogRandom((int)message.Chat.Id)}");
+                        
                     }
                     else if (message.Text.ToLower() == "/status")
                     {
 
-                        await botClient.SendTextMessageAsync(message.Chat, $"{DB_Status(message)}");
+                        await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.GetUserByID((int)message.Chat.Id).GetAllStatus()}");
+                        
                     }
                     else if (message.Text.ToLower() == "/reg")
                     {
-                        await botClient.SendTextMessageAsync(message.Chat, $"{Add_DB_Test(message)}");
+                        await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.CreateNewUser(userDAO.CreateNewUser((int)message.Chat.Id, message.Chat.FirstName))}");
 
                     }
                     else
@@ -60,36 +84,35 @@ namespace TelegramDOGs
                         await botClient.SendTextMessageAsync(message.Chat, $" ID:{message.Chat.Id} UserName: {message.Chat.FirstName} text: {message.Text}");
 
                     }
+                    
                 }
                     if(message.Photo != null)
                     {
                     
                         await botClient.SendTextMessageAsync(message.Chat.Id, "Фотка зачёт");
                     }
-                    
 
+                   
                 }
+               
                 
                 if(update.Type==Telegram.Bot.Types.Enums.UpdateType.EditedMessage)
                 {
                     var edited_message = update.EditedMessage;
                     await botClient.SendTextMessageAsync(edited_message.Chat, "Опа кто то изменил сообщение извени я такое не понимаю...");
+                    
                 }
             }
 
         private static IReplyMarkup GetButton()
         {
             List<List<KeyboardButton>> KeyboardButtonTest = new List<List<KeyboardButton>>();
-            KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("Найти собаку"),new KeyboardButton("/status")});
+            KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("/finddog"),new KeyboardButton("/status")});
             KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("Купить собаку"), new KeyboardButton("Бой") });
-
-
-            var keybord = new ReplyKeyboardMarkup(KeyboardButtonTest);
-
-            
+            var keybord = new ReplyKeyboardMarkup(KeyboardButtonTest);            
             return keybord;
         }
-
+        
         public static async Task AdminMessage(ITelegramBotClient botClient)
             {
                 Console.WriteLine("Введите ID Пользователя:");
@@ -97,103 +120,24 @@ namespace TelegramDOGs
                 Console.WriteLine($"Введите сообщение которое нужно оптавить юзеру");
                 string Text = Console.ReadLine();
                 await botClient.SendTextMessageAsync(ID,Text);
-            }
-            public static string DB_Status(Message message)
-        {
-            int ID =Convert.ToInt32(message.Chat.Id);
-            DataBase DB = new DataBase();
-            DataTable table = new DataTable();
-            MySqlDataAdapter adapter = new MySqlDataAdapter();
-            MySqlCommand Command = new MySqlCommand("SELECT * FROM `users` WHERE `id` = @ID",DB.GetConnection());
-            Command.Parameters.Add("@ID",MySqlDbType.Int32).Value=ID;
-            adapter.SelectCommand = Command;
-            adapter.Fill(table);
-            if(table.Rows.Count>0)
-            {
-                Console.WriteLine($"Найден пользователь ID: {ID}");
-                string t = $"Найден пользователь ID: {ID}";
-                return t;
-            }
-            else
-            {
-                Console.WriteLine("Не найдено");
-                return "Не найдено";
-            }    
-        }
-            public static bool isCreate(string DB_status)
-            {
-                if(DB_status== "Не найдено")
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            public static string Add_DB_Test(Message message)
-        {
-            if(isCreate(DB_Status(message)))
-            {
-                DataBase DB = new DataBase();
+            }        
 
-                MySqlCommand Command = new MySqlCommand($"INSERT INTO `users` (`id`, `name`, `countDogs`) VALUES (@ID, @UserName, @CountDogs)", DB.GetConnection());
-                Command.Parameters.Add("@ID", MySqlDbType.Int32).Value = Convert.ToInt32(message.Chat.Id);
-                Command.Parameters.Add("@UserName", MySqlDbType.VarChar).Value = message.Chat.FirstName;
-                Command.Parameters.Add("@CountDogs", MySqlDbType.Int32).Value = 0;
-                DB.OpenConnection();
-                if (Command.ExecuteNonQuery() == 1)
-                {
-                    Console.WriteLine("Регестрация успешна");
-                }
-                else
-                {
-
-                }
-                DB.CloseConnection();
-                return "Акаунт зарегестрирован.";
-            }
-            else
+        public static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
             {
-                return "Акаунт уже есть...";
-            }
-            
-            
-        }
-            /*public static void Status_Server()
-            {
-                proccesAPI.StatusServer();
-
-
                 
-                foreach (Process process in Process.GetProcesses())
-                {
-
-                
-                    if (process.ProcessName == "MAMP")
-                {
-                    process.Kill();
-                }
-                    */
-            
-            
-
-
-        
-            public static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
-            {
-                // Некоторые действия
                  Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(exception));
             }
         static void Main(string[] args)
-        {
+         {
+               proccesAPI.StartServer();
+                
                 Console.WriteLine("Запущен бот " + bot.GetMeAsync().Result.FirstName);
                 
                 var cts = new CancellationTokenSource();
                 var cancellationToken = cts.Token;
                 var receiverOptions = new ReceiverOptions
                 {
-                    AllowedUpdates = { }, // receive all update types
+                    AllowedUpdates = { }, 
                 };
                 bot.StartReceiving(
                     HandleUpdateAsync,
@@ -202,7 +146,7 @@ namespace TelegramDOGs
                     cancellationToken
                 );
 
-
+            
             bool ServerActiv = true;  
             while (ServerActiv)
             {
@@ -228,6 +172,20 @@ namespace TelegramDOGs
                 if(key.Key == ConsoleKey.PageDown)
                 {
                     proccesAPI.StopServer();
+                }
+                 if(key.Key==ConsoleKey.Delete)
+                {
+                    DB.OpenConnection();
+                    string idadmina = "683008996";
+                    MySqlDataAdapter adapter = new MySqlDataAdapter();
+                    MySqlCommand command = new MySqlCommand($"DELETE FROM `users` WHERE `id`={idadmina}", DB.GetConnection());
+                    adapter.SelectCommand = command;
+                    if(command.ExecuteNonQuery() == 1)
+                    {
+                        Console.WriteLine("Админ удален");
+                    }
+                    DB.CloseConnection();
+                    
                 }
             }
                
