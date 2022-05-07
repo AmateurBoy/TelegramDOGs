@@ -81,15 +81,15 @@ namespace TelegramDOGs
                                         break;
                                     case "Найти собаку":
                                         await botClient.SendTextMessageAsync(message.Chat, $"{dogDAO.CreatDogRandom((int)message.Chat.Id)}", replyMarkup: GetButton());
-
                                         break;
                                     case "/reg":
                                         await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.CreateNewUser(userDAO.CreateNewUser((int)message.Chat.Id, message.Chat.FirstName))}", replyMarkup: GetButton());
-
                                         break;
                                     case "Лучшие игроки":
                                         await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.Statistic()}", replyMarkup: GetButton());
-
+                                        break;
+                                    case "Магазин":
+                                        await botClient.SendTextMessageAsync(message.Chat, $"В Разработке", replyMarkup: GetButton());
                                         break;
                                     default:
                                         await botClient.SendTextMessageAsync(message.Chat, $" ID:{message.Chat.Id} UserName: {message.Chat.FirstName} text: {message.Text}", replyMarkup: GetButton());
@@ -136,7 +136,7 @@ namespace TelegramDOGs
         {
             List<List<KeyboardButton>> KeyboardButtonTest = new List<List<KeyboardButton>>();
             KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("Найти собаку"),new KeyboardButton("Мой Профиль")});
-            KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("Купить собаку"), new KeyboardButton("Лучшие игроки") });
+            KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("Магазин"), new KeyboardButton("Лучшие игроки") });
             var keybord = new ReplyKeyboardMarkup(KeyboardButtonTest);
             keybord.ResizeKeyboard = true;
             return keybord;

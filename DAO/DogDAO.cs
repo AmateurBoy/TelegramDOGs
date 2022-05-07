@@ -48,24 +48,55 @@ namespace TelegramDOGs
         }
         #endregion
         public string CreatDogRandom(int UserId)
-        {
+         {
+            int Energy = 0;
             Random R = new Random();
-            if (R.Next(0, 100) < 20)
+            MySqlDataAdapter Adapter = new MySqlDataAdapter();
+            MySqlCommand CommandEnergySelect = new MySqlCommand($"SELECT `EnergeUser` FROM `users` WHERE `id`={UserId}", DB.GetConnection());
+           
+            DataTable table = new DataTable();            
+            Adapter.SelectCommand = CommandEnergySelect;
+            Adapter.Fill(table);
+            if (table.Rows.Count>0)
             {
-                MySqlDataAdapter adapter = new MySqlDataAdapter();
-                Dog dog = new Dog(R.Next(0,999999), "ДворнягаСимпатяга", (byte)R.Next(0, 85), (byte)R.Next(0, 10), R.Next(3, 25));
+                foreach (DataRow item in table.Rows)
+                {
+                    Energy = (int)item.ItemArray[0];
+
+                }
+                if (Energy >= 10)
+                {
+                    MySqlCommand CommandEnergyUpdate = new MySqlCommand($"UPDATE `users` SET `EnergeUser`=@SetEnergy WHERE `id`={UserId}", DB.GetConnection());
+                    Energy -= 10;
+                    CommandEnergyUpdate.Parameters.Add("@SetEnergy", MySqlDbType.Double).Value = Energy;
+                    Adapter.SelectCommand = CommandEnergyUpdate;
+                    if (CommandEnergyUpdate.ExecuteNonQuery() == 1)
+                    {
+                        if (R.Next(0, 100) < 20)
+                        {
+                            MySqlDataAdapter adapter = new MySqlDataAdapter();
+                            Dog dog = new Dog(R.Next(0, 999999), "ДворнягаСимпатяга", (byte)R.Next(0, 85), (byte)R.Next(0, 10), R.Next(3, 25));
+
+                            MySqlCommand command = new MySqlCommand($"INSERT INTO `dogs`(`id`,`age`, `name`, `typedog`, `satiety`, `hp`, `lvl`, `Endurance`, `Agility`, `Intelligence`, `userid`, `multiplier`,`regDoguser`) VALUES ('{dog.id}','{dog.age}','{dog.name}','{dog.TypeDogString}','{dog.satiety}','{dog.HP}','{dog.lvl}','{dog.Endurance}','{dog.Agility}','{dog.Intelligence}','{UserId}',@multiplier,@DataUpdate)", DB.GetConnection());
+                            command.Parameters.Add("@DataUpdate", MySqlDbType.Date).Value = DateTime.Now;
+                            command.Parameters.Add("@multiplier", MySqlDbType.Double).Value = dog.multiplier;
+                            adapter.SelectCommand = command;
+                            if (command.ExecuteNonQuery() == 1)
+                            { }
+
+                            return $"найдена собака породы {dog.TypeDogString}";
+                        }
+                        else return $"Поиск обернулся ничем";
+                    }
+                    return "";
+                }
+                else
+                {
+                    return "Недостаточно енергии...";
+                }
                 
-                MySqlCommand command = new MySqlCommand($"INSERT INTO `dogs`(`id`,`age`, `name`, `typedog`, `satiety`, `hp`, `lvl`, `Endurance`, `Agility`, `Intelligence`, `userid`, `multiplier`,`regDoguser`) VALUES ('{dog.id}','{dog.age}','{dog.name}','{dog.TypeDogString}','{dog.satiety}','{dog.HP}','{dog.lvl}','{dog.Endurance}','{dog.Agility}','{dog.Intelligence}','{UserId}',@multiplier,@DataUpdate)", DB.GetConnection());
-                command.Parameters.Add("@DataUpdate", MySqlDbType.Date).Value = DateTime.Now;
-                command.Parameters.Add("@multiplier", MySqlDbType.Double).Value = dog.multiplier;
-                adapter.SelectCommand = command;
-                if(command.ExecuteNonQuery() == 1)
-                { }    
-
-                return $"найдена собака породы {dog.TypeDogString}";
             }
-            else return $"Поиск обернулся ничем";
-
+            return "Ошибочка";
 
         }
         public List<Dog> GetAllDogsUsers(int userId)

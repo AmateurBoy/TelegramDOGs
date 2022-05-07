@@ -109,15 +109,25 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
 
                     double dohod = multsuma * DateTime.Now.Subtract(user.DataUpdate).TotalSeconds;
                     user.money += (multsuma * DateTime.Now.Subtract(user.DataUpdate).TotalSeconds);
+                    if((int)DateTime.Now.Subtract(user.DataUpdate).TotalSeconds/60>=100)
+                    {
+                        user.EnergyUser = 100;
+                    }
+                    else
+                    {
+                        if(user.EnergyUser<100)
+                        user.EnergyUser += (int)DateTime.Now.Subtract(user.DataUpdate).TotalSeconds / 60;
+                    }
 
                 }
 
 
-                MySqlCommand command = new MySqlCommand($"UPDATE `users` SET `money`=@money,`countDogs`=@countDogs,`DateUpdate`=@DataUpdate WHERE `id`=@id", DB.GetConnection());
+                MySqlCommand command = new MySqlCommand($"UPDATE `users` SET `money`=@money,`countDogs`=@countDogs,`DateUpdate`=@DataUpdate,`EnergeUser`=@Energy WHERE `id`=@id", DB.GetConnection());
                 command.Parameters.Add("@DataUpdate", MySqlDbType.DateTime).Value = DateTime.Now;
                 command.Parameters.Add("@money", MySqlDbType.Double).Value = user.money;
                 command.Parameters.Add("@countDogs", MySqlDbType.Int32).Value = user.Dogs.Count;
                 command.Parameters.Add("@id", MySqlDbType.Int32).Value = user.Id;
+                command.Parameters.Add("@Energy", MySqlDbType.Int32).Value = user.EnergyUser;
 
 
                 if (command.ExecuteNonQuery() == 1)
