@@ -51,6 +51,7 @@ namespace TelegramDOGs
                 
             }
                */
+            
             if(message != null)
             {
                 if (userDAO.IsAcaunt((int)message.Chat.Id))
@@ -80,6 +81,13 @@ namespace TelegramDOGs
                                         break;
                                     case "Главное меню":
                                         await botClient.SendTextMessageAsync(message.Chat, $"Магазин => Главное меню", replyMarkup: GetButton());
+                                        break;
+                                    case "Купить еды":
+                                        break;
+                                    case "Купить енергию":
+                                        await botClient.SendTextMessageAsync(message.Chat, $"Купить енергию", replyMarkup: BotControlButtons.GetBuy());
+                                        break;
+                                    case "Купить собаку":
                                         break;
                                     case "Найти собаку":
                                         await botClient.SendTextMessageAsync(message.Chat, $"{dogDAO.CreatDogRandom((int)message.Chat.Id)}", replyMarkup: GetButton());
@@ -122,9 +130,21 @@ namespace TelegramDOGs
                     }
                 }
             }
+            if(update.Type == Telegram.Bot.Types.Enums.UpdateType.CallbackQuery)
+            {
+                //оброботка CallbackQuery
+                switch (update.CallbackQuery.Data)
+                {
+                    case"2":
+                        Console.WriteLine("Член нажат");
+                        break;
+                }
+                   
+                
+            }
             else
             {
-                await botClient.DeleteMessageAsync(update.ChannelPost.Chat.Id,update.ChannelPost.MessageId);
+                
             }
            
            

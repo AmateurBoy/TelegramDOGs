@@ -25,5 +25,11 @@ namespace TelegramDOGs
             keybord.ResizeKeyboard = true;
             return keybord;
         }
+        
+        public static IReplyMarkup GetBuy()
+        {
+            return new InlineKeyboardMarkup(new InlineKeyboardButton("Купить 10 енергии за 10000 монет") { Text = "Член",CallbackData="2"}) ;
+        }
+
     }
 }
