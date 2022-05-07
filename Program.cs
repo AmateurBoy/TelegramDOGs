@@ -77,7 +77,9 @@ namespace TelegramDOGs
                                         break;
                                     case "Мой Профиль":
                                         await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.GetUserByID((int)message.Chat.Id).GetAllStatus()}", replyMarkup: GetButton());
-
+                                        break;
+                                    case "Главное меню":
+                                        await botClient.SendTextMessageAsync(message.Chat, $"Магазин => Главное меню", replyMarkup: GetButton());
                                         break;
                                     case "Найти собаку":
                                         await botClient.SendTextMessageAsync(message.Chat, $"{dogDAO.CreatDogRandom((int)message.Chat.Id)}", replyMarkup: GetButton());
@@ -89,10 +91,10 @@ namespace TelegramDOGs
                                         await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.Statistic()}", replyMarkup: GetButton());
                                         break;
                                     case "Магазин":
-                                        await botClient.SendTextMessageAsync(message.Chat, $"В Разработке", replyMarkup: GetButton());
+                                        await botClient.SendTextMessageAsync(message.Chat, $"В Разработке", replyMarkup: BotControlButtons.GetButtonShop());
                                         break;
                                     default:
-                                        await botClient.SendTextMessageAsync(message.Chat, $" ID:{message.Chat.Id} UserName: {message.Chat.FirstName} text: {message.Text}", replyMarkup: GetButton());
+                                        await botClient.SendTextMessageAsync(message.Chat, $" ID:{message.Chat.Id} UserName: {message.Chat.FirstName} text: {message.Text}");
                                         break;
                                 }
                                 break;
