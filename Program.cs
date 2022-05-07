@@ -27,58 +27,108 @@ namespace TelegramDOGs
 
         public static bool ButtonActiv = false;
         static ITelegramBotClient bot = new TelegramBotClient("5384438845:AAG6qrDzwcni1Lk8bBIkXAPCJ2-D7YVG6j0");
-            
+
         public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+        {
+            var message = update.Message;
+            // Некоторые действия
+            //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(update));
+            /*
+            if (AdminClass.ActivChat == false)
             {
-                
-                // Некоторые действия
-                //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(update));
                 Console.WriteLine($"Id:{update.Message.Chat.Id} Name:{update.Message.Chat.FirstName} " +
-                    $"\nText:{update.Message.Text}");
-                
-                 switch(update.Type)
+                 $"\nText:{update.Message.Text}");
+                userDAO.UpdateUser(userDAO.GetUserByID((int)message.Chat.Id));
+            }
+            else
+            {
+                if(update.Message.Chat.Id==AdminClass.IDactivChat)
                 {
-                    case Telegram.Bot.Types.Enums.UpdateType.Message:
+                    Console.WriteLine($"Id:{update.Message.Chat.Id} Name:{update.Message.Chat.FirstName} " +
+                    $"\nText:{update.Message.Text}");
+                    userDAO.UpdateUser(userDAO.GetUserByID((int)message.Chat.Id));
+                }
+                
+            }
+               */
+            if(message != null)
+            {
+                if (userDAO.IsAcaunt((int)message.Chat.Id))
+                {
+                    userDAO.UpdateUser(userDAO.GetUserByID((int)message.Chat.Id));
+                    switch (update.Type)
                     {
-                        var message = update.Message;
-                        userDAO.UpdateUser(userDAO.GetUserByID((int)message.Chat.Id));
-                        if (message.Photo != null)
-                        {
-                            await botClient.SendTextMessageAsync(message.Chat.Id, "Фотка зачёт");
-                        }
-                        switch (message.Text)
-                        {
-                            case "/start":
-                                await botClient.SendTextMessageAsync(message.Chat, "*Тут приветствие, а так же правиа игры (Должны быть :))");
-                                await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.CreateNewUser(userDAO.CreateNewUser((int)message.Chat.Id, message.Chat.FirstName))}");
-                                await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.GetUserByID((int)message.Chat.Id).GetAllStatus()}");
+                        case Telegram.Bot.Types.Enums.UpdateType.Message:
+                            {
+
+
+
+                                if (message.Photo != null)
+                                {
+                                    await botClient.SendTextMessageAsync(message.Chat.Id, "Фотка зачёт");
+                                }
+                                switch (message.Text)
+                                {
+                                    case "/start":
+                                        await botClient.SendTextMessageAsync(message.Chat, "*Тут приветствие, а так же правиа игры (Должны быть :))");
+                                        await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.CreateNewUser(userDAO.CreateNewUser((int)message.Chat.Id, message.Chat.FirstName))}");
+                                        await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.GetUserByID((int)message.Chat.Id).GetAllStatus()}");
+
+                                        break;
+                                    case "Мой Профиль":
+                                        await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.GetUserByID((int)message.Chat.Id).GetAllStatus()}", replyMarkup: GetButton());
+
+                                        break;
+                                    case "Найти собаку":
+                                        await botClient.SendTextMessageAsync(message.Chat, $"{dogDAO.CreatDogRandom((int)message.Chat.Id)}", replyMarkup: GetButton());
+
+                                        break;
+                                    case "/reg":
+                                        await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.CreateNewUser(userDAO.CreateNewUser((int)message.Chat.Id, message.Chat.FirstName))}", replyMarkup: GetButton());
+
+                                        break;
+                                    case "Лучшие игроки":
+                                        await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.Statistic()}", replyMarkup: GetButton());
+
+                                        break;
+                                    default:
+                                        await botClient.SendTextMessageAsync(message.Chat, $" ID:{message.Chat.Id} UserName: {message.Chat.FirstName} text: {message.Text}", replyMarkup: GetButton());
+                                        break;
+                                }
                                 break;
-                            case "Мой Профиль":
-                                await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.GetUserByID((int)message.Chat.Id).GetAllStatus()}", replyMarkup: GetButton());
+                            }
+                        case Telegram.Bot.Types.Enums.UpdateType.EditedMessage:
+                            {
+                                var edited_message = update.EditedMessage;
+                                await botClient.SendTextMessageAsync(edited_message.Chat, "Опа кто то изменил сообщение извени я такое не понимаю...");
                                 break;
-                            case "Найти собаку":
-                                await botClient.SendTextMessageAsync(message.Chat, $"{dogDAO.CreatDogRandom((int)message.Chat.Id)}", replyMarkup: GetButton());
-                                break;
-                            case "/reg":
-                                await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.CreateNewUser(userDAO.CreateNewUser((int)message.Chat.Id, message.Chat.FirstName))}", replyMarkup: GetButton());
-                                break;
-                            default:
-                                await botClient.SendTextMessageAsync(message.Chat, $" ID:{message.Chat.Id} UserName: {message.Chat.FirstName} text: {message.Text}", replyMarkup: GetButton());
-                                break;
-                        }
-                        break;
-                    }
-                    case Telegram.Bot.Types.Enums.UpdateType.EditedMessage:
-                    {
-                        var edited_message = update.EditedMessage;
-                        await botClient.SendTextMessageAsync(edited_message.Chat, "Опа кто то изменил сообщение извени я такое не понимаю...");
-                        break;
-                    }
-                    case Telegram.Bot.Types.Enums.UpdateType.CallbackQuery:
-                    {
-                        break;
+                            }
+
                     }
                 }
+                else
+                {
+                    if (update.Message.Chat.Id > 0)
+                    {
+                        await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.CreateNewUser(userDAO.CreateNewUser((int)message.Chat.Id, message.Chat.FirstName))}");
+                        await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.GetUserByID((int)message.Chat.Id).GetAllStatus()}");
+                    }
+
+                    else
+                    {
+
+                    }
+                }
+            }
+            else
+            {
+                await botClient.DeleteMessageAsync(update.ChannelPost.Chat.Id,update.ChannelPost.MessageId);
+            }
+           
+           
+            
+
+            
                 
             }
 
@@ -86,7 +136,7 @@ namespace TelegramDOGs
         {
             List<List<KeyboardButton>> KeyboardButtonTest = new List<List<KeyboardButton>>();
             KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("Найти собаку"),new KeyboardButton("Мой Профиль")});
-            KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("Купить собаку"), new KeyboardButton("Бой") });
+            KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("Купить собаку"), new KeyboardButton("Лучшие игроки") });
             var keybord = new ReplyKeyboardMarkup(KeyboardButtonTest);
             keybord.ResizeKeyboard = true;
             return keybord;
@@ -111,6 +161,7 @@ namespace TelegramDOGs
                 proccesAPI.StartServer();      
                 Console.WriteLine("Запущен бот " + bot.GetMeAsync().Result.FirstName);
                 
+                
                 var cts = new CancellationTokenSource();
                 var cancellationToken = cts.Token;
                 var receiverOptions = new ReceiverOptions
@@ -130,10 +181,15 @@ namespace TelegramDOGs
             {
                 ConsoleKeyInfo key;
                 key = Console.ReadKey();
-                if (key.Key == ConsoleKey.End)
+                
+                    if (key.Key == ConsoleKey.End)
                 {
-                    Console.WriteLine("AdminMessageActiv");
-                    AdminMessage(bot);
+                    Console.WriteLine("AdminMessageActiv" +
+                        "" +
+                        "" +
+                        "" +
+                        "=========================================");
+                    AdminClass.AdminChat(bot);
 
                 }
                 if(key.Key == ConsoleKey.Home)

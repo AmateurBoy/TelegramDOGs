@@ -62,9 +62,9 @@ namespace TelegramDOGs
                 if(command.ExecuteNonQuery() == 1)
                 { }    
 
-                return $"найдена собака породи {dog.TypeDogString}";
+                return $"найдена собака породы {dog.TypeDogString}";
             }
-            else return $"Поиск обернулся нечем";
+            else return $"Поиск обернулся ничем";
 
 
         }

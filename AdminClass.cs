@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
+using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using TelegramDOGs.Entity;
 
@@ -10,6 +12,8 @@ namespace TelegramDOGs
 {
     static class AdminClass
     {
+        public static bool ActivChat = false;
+        public static long IDactivChat = 0;
         static DataBase DB = new DataBase();
         public static void AddUserPanel(Message message)
         {
@@ -70,9 +74,33 @@ namespace TelegramDOGs
                 return false;
             }
         }
-        public static void Chat()
+        public static async Task AdminChat(ITelegramBotClient botClient)
         {
-            
+            bool Start = true;
+            Console.WriteLine("Введите ид пользователя");
+            long id = Convert.ToInt64(Console.ReadLine());
+            IDactivChat = id;
+            ActivChat = true;
+            while (Start)
+            {
+                string Text = Console.ReadLine();
+               
+                switch (Text)
+                {
+                        case "":
+                            Console.WriteLine("null");
+                            Console.WriteLine("Отслеживание чата зваершиенно.");
+                        Start = false;
+                        ActivChat = false;
+                        break;
+                    default:
+                        await botClient.SendTextMessageAsync(id, Text);
+                        break;
+                }  
+                
+                
+            }
         }
+        
     }
 }

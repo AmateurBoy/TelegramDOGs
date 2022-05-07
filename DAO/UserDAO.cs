@@ -97,38 +97,80 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
     public void UpdateUser(User user)
       {
             
-         
-         double multsuma = 0;
-            if(user.Dogs!=null)
+         if(user.Id!=0)
             {
-                foreach (Dog item in user.Dogs)
+                double multsuma = 0;
+                if (user.Dogs != null)
                 {
-                    multsuma += item.multiplier; 
+                    foreach (Dog item in user.Dogs)
+                    {
+                        multsuma += item.multiplier;
+                    }
+
+                    double dohod = multsuma * DateTime.Now.Subtract(user.DataUpdate).TotalSeconds;
+                    user.money += (multsuma * DateTime.Now.Subtract(user.DataUpdate).TotalSeconds);
+
                 }
 
-                double dohod =  multsuma * DateTime.Now.Subtract(user.DataUpdate).TotalSeconds;
-                user.money +=  (multsuma * DateTime.Now.Subtract(user.DataUpdate).TotalSeconds);
-                
-                Console.WriteLine($"Dohod {dohod}/{DateTime.Now.Subtract(user.DataUpdate).TotalSeconds}");
-                
-            }        
-            
-           
-            MySqlCommand command = new MySqlCommand($"UPDATE `users` SET `money`=@money,`countDogs`=@countDogs,`DateUpdate`=@DataUpdate WHERE `id`=@id", DB.GetConnection());
-            command.Parameters.Add("@DataUpdate", MySqlDbType.DateTime).Value = DateTime.Now;
-            command.Parameters.Add("@money", MySqlDbType.Double).Value = user.money;
-            command.Parameters.Add("@countDogs", MySqlDbType.Int32).Value = user.Dogs.Count;
-            command.Parameters.Add("@id", MySqlDbType.Int32).Value =user.Id;
+
+                MySqlCommand command = new MySqlCommand($"UPDATE `users` SET `money`=@money,`countDogs`=@countDogs,`DateUpdate`=@DataUpdate WHERE `id`=@id", DB.GetConnection());
+                command.Parameters.Add("@DataUpdate", MySqlDbType.DateTime).Value = DateTime.Now;
+                command.Parameters.Add("@money", MySqlDbType.Double).Value = user.money;
+                command.Parameters.Add("@countDogs", MySqlDbType.Int32).Value = user.Dogs.Count;
+                command.Parameters.Add("@id", MySqlDbType.Int32).Value = user.Id;
 
 
-            if (command.ExecuteNonQuery() == 1)
-            {
-                Console.WriteLine("Обновлено");
+                if (command.ExecuteNonQuery() == 1)
+                {
+                    if (AdminClass.ActivChat == false)
+                        Console.WriteLine("Обновлено");
+                }
+
             }
 
 
         }
-         
+    public string Statistic()
+    {
+            DataTable table = new DataTable();
+            MySqlDataAdapter adapter = new MySqlDataAdapter();
+            MySqlCommand Command = new MySqlCommand($"SELECT * FROM `users` ORDER BY `users`.`money` DESC", DB.GetConnection());
+            adapter.SelectCommand = Command;
+            adapter.Fill(table);
+            string result = "";
+            int count = 0;
+            string Winer(int i)
+            {
+                switch(i)
+                {
+                    case 1:
+                        return "🥇";
+                        break;
+                    case 2:
+                        return "🥈";
+                        break;
+                    case 3:
+                        return "🥉";
+                        break;
+                    default:
+                        return "🗿";
+                        break;
+                }
+                
+            }
+            foreach (DataRow item in table.Rows)
+            {
+                count++;
+                if(count>5)
+                {
+                    break;
+                }
+                result += $"{Winer(count)} {count}. Имя: {item.ItemArray[1]}." +
+                    $"\nDogs: {item.ItemArray[2]}" +
+                    $"\nMoney:{Convert.ToDouble(item.ItemArray[3])}\n\n";
+            }
+            return result;
+        }
     public User GetUserByID(int ID)
     {
         DataTable table = new DataTable();
@@ -136,19 +178,20 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
         MySqlCommand Command = new MySqlCommand($"SELECT * FROM `users` WHERE `id`={ID}", DB.GetConnection());
         adapter.SelectCommand = Command;
         adapter.Fill(table);
-        if(table.Rows.Count>0)
-        {
-                    
-        }
         User user = new User();
-        foreach (DataRow item in table.Rows)
+        if (table.Rows.Count>0)
         {
-            user = InitializationUser(item.ItemArray);
+                foreach (DataRow item in table.Rows)
+                {
+                    user = InitializationUser(item.ItemArray);
+                }
         }
+      
+        
         
         return user;
     }
-    private bool IsAcaunt(long ID)
+    public bool IsAcaunt(long ID)
     {
         DataTable table = new DataTable();
         MySqlDataAdapter adapter = new MySqlDataAdapter();
