@@ -47,7 +47,20 @@ namespace TelegramDOGs
             Updatedog();
             
         }
+        public string DogInfo()
+        {
+            string info = "";
+            info += $"Id:{id}\n";
+            info += $"Имя:{name}\n";
+            info += $"Порода:{TypeDogString}\n";
+            info += $"Возраст:{age}\n";
+            info += $"Сытость:{satiety}\n";
+            info += $"Здоровье:{HP}\n";
+            info += $"Уровень:{lvl}\n";
+            info += $"Сила/Ловкость/Интелект:{Endurance}/{Agility}/{Intelligence}\n";
+            return info;
 
+        }
         public void SetTypeDogRandom()
         {
             TypeDogString = Convert.ToString((TypeDogs)R.Next(0,6));

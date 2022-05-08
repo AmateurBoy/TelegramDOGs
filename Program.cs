@@ -19,11 +19,12 @@ namespace TelegramDOGs
     class Program
     {
         static string GameRulesText = "";
-
+        
         public static ProccesServec proccesAPI = ProccesServec.GetProccesAPI();
         
         public static UserDAO userDAO = UserDAO.GetInstens();
         public static DogDAO dogDAO = DogDAO.GetInstens();
+        
         public static DataBase DB = new DataBase();
 
         public static bool ButtonActiv = false;
@@ -33,7 +34,7 @@ namespace TelegramDOGs
         {
             var message = update.Message;
             // Некоторые действия
-            //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(update));
+            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(update));
             /*
             if (AdminClass.ActivChat == false)
             {
@@ -57,67 +58,76 @@ namespace TelegramDOGs
             {
                 if (userDAO.IsAcaunt((int)message.Chat.Id))
                 {
-                    userDAO.UpdateUser(userDAO.GetUserByID((int)message.Chat.Id));
-                    switch (update.Type)
-                    {
-                        case Telegram.Bot.Types.Enums.UpdateType.Message:
-                            {
-                                if (message.Photo != null)
-                                {
-                                    await botClient.SendTextMessageAsync(message.Chat.Id, "Фотка зачёт");
-                                }
-                                switch (message.Text)
-                                {
-                                    case "/start":
-                                        await botClient.SendTextMessageAsync(message.Chat, "*Тут приветствие, а так же правиа игры (Должны быть :))");
-                                        await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.CreateNewUser(userDAO.CreateNewUser((int)message.Chat.Id, message.Chat.FirstName))}");
-                                        await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.GetUserByID((int)message.Chat.Id).GetAllStatus()}");
 
-                                        break;
-                                    case "Правила":
-                                        await botClient.SendTextMessageAsync(message.Chat, $"{GameRulesText}", replyMarkup: BotControlButtons.GetButtonMainMenu());
-                                        break;
-                                    case "Мой Профиль":
-                                        await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.GetUserByID((int)message.Chat.Id).GetAllStatus()}", replyMarkup: BotControlButtons.GetButtonMyStatus());
-                                        break;
-                                    case "Мои Собаки":
-                                        await botClient.SendTextMessageAsync(message.Chat, $"Ваши собаки:", replyMarkup: BotControlButtons.GetDogButton(userDAO.GetUserByID((int)message.Chat.Id).Dogs));
-                                        break;                                    
-                                    case "Главное меню":
-                                        await botClient.SendTextMessageAsync(message.Chat, $"Магазин => Главное меню", replyMarkup: GetButton());
-                                        break;
-                                    case "Купить еды":
-                                        break;
-                                    case "Купить енергию":
-                                        await botClient.SendTextMessageAsync(message.Chat, $"Купить енергию", replyMarkup: BotControlButtons.GetBuy());
-                                        break;
-                                    case "Купить собаку":
-                                        break;
-                                    case "Найти собаку":
-                                        await botClient.SendTextMessageAsync(message.Chat, $"{dogDAO.CreatDogRandom(userDAO.GetUserByID((int)message.Chat.Id))}", replyMarkup: GetButton());
-                                        break;
-                                    case "/reg":
-                                        await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.CreateNewUser(userDAO.CreateNewUser((int)message.Chat.Id, message.Chat.FirstName))}", replyMarkup: GetButton());
-                                        break;
-                                    case "Лучшие игроки":
-                                        await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.Statistic()}", replyMarkup: GetButton());
-                                        break;
-                                    case "Магазин":
-                                        await botClient.SendTextMessageAsync(message.Chat, $"В Разработке", replyMarkup: BotControlButtons.GetButtonShop());
-                                        break;
-                                    default:
-                                        await botClient.SendTextMessageAsync(message.Chat, $" ID:{message.Chat.Id} UserName: {message.Chat.FirstName} text: {message.Text}");
-                                        break;
-                                }
-                                break;
-                            }
-                        case Telegram.Bot.Types.Enums.UpdateType.EditedMessage:
+                    userDAO.UpdateUser(userDAO.GetUserByID((int)message.Chat.Id));
+                    dogDAO.EditNameDogs(message.Text,(int)message.Chat.Id);
+                    switch (update.Type)
+            {
+
+                case Telegram.Bot.Types.Enums.UpdateType.Message:
+                    {
+                        if (message.Photo != null)
                         {
-                            var edited_message = update.EditedMessage;
-                            await botClient.SendTextMessageAsync(edited_message.Chat, "Опа кто то изменил сообщение извени я такое не понимаю...");
-                            break;
+                            await botClient.SendTextMessageAsync(message.Chat.Id, "Фотка зачёт");
                         }
+                        
+                                
+                        switch (message.Text)
+                        {
+                            case "/start":
+                                await botClient.SendTextMessageAsync(message.Chat, "*Тут приветствие, а так же правиа игры (Должны быть :))");
+                                await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.CreateNewUser(userDAO.CreateNewUser((int)message.Chat.Id, message.Chat.FirstName))}");
+                                await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.GetUserByID((int)message.Chat.Id).GetAllStatus()}");
+
+                                break;
+                            case "Правила":
+                                await botClient.SendTextMessageAsync(message.Chat, $"{GameRulesText}", replyMarkup: BotControlButtons.GetButtonMainMenu());
+                                break;
+                            case "Мой Профиль":
+                                await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.GetUserByID((int)message.Chat.Id).GetAllStatus()}", replyMarkup: BotControlButtons.GetButtonMyStatus());
+                                break;
+                            case "Мои Собаки":
+                                await botClient.SendTextMessageAsync(message.Chat, $"Ваши собаки:", replyMarkup: BotControlButtons.GetDogButton(userDAO.GetUserByID((int)message.Chat.Id).Dogs));
+                                break;
+                            case "Главное меню":
+                                await botClient.SendTextMessageAsync(message.Chat, $"Магазин => Главное меню", replyMarkup: GetButton());
+                                break;
+                            case "Купить еды":
+                                break;
+                            case "Купить енергию":
+                                await botClient.SendTextMessageAsync(message.Chat, $"Купить енергию", replyMarkup: BotControlButtons.GetBuy());
+                                break;
+                            case "Купить собаку":
+                                break;
+                            case "Найти собаку":
+                                await botClient.SendTextMessageAsync(message.Chat, $"{dogDAO.CreatDogRandom(userDAO.GetUserByID((int)message.Chat.Id))}", replyMarkup: GetButton());
+                                break;
+                            case "/reg":
+                                await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.CreateNewUser(userDAO.CreateNewUser((int)message.Chat.Id, message.Chat.FirstName))}", replyMarkup: GetButton());
+                                break;
+                            case "Лучшие игроки":
+                                await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.Statistic()}", replyMarkup: GetButton());
+                                break;
+                            case "Магазин":
+                                await botClient.SendTextMessageAsync(message.Chat, $"В Разработке", replyMarkup: BotControlButtons.GetButtonShop());
+                                break;
+                           
+                            default:
+                                await botClient.SendTextMessageAsync(message.Chat, $" ID:{message.Chat.Id} UserName: {message.Chat.FirstName} text: {message.Text}");
+                                break;
+                        }
+                        break;
                     }
+                case Telegram.Bot.Types.Enums.UpdateType.EditedMessage:
+                    {
+                        var edited_message = update.EditedMessage;
+                        await botClient.SendTextMessageAsync(edited_message.Chat, "Опа кто то изменил сообщение извени я такое не понимаю...");
+                        break;
+                    }
+            }
+                    
+                    
+                    
                 }
                 else
                 {
@@ -128,40 +138,110 @@ namespace TelegramDOGs
                     }
                 }
             }
-            if(update.Type == Telegram.Bot.Types.Enums.UpdateType.CallbackQuery)
+            
+            if (update.Type == Telegram.Bot.Types.Enums.UpdateType.CallbackQuery)
             {
+                int idDog = 0;
                 //оброботка CallbackQuery
                 switch (update.CallbackQuery.Data)
                 {
-                    case"0":
-                        Console.WriteLine("Пес0");
+                    case "Buy energy in the store":
+                        Console.WriteLine("Buy energy in the store");
                         break;
+                    
+                    case "0":
+                         idDog = dogDAO.GetAllDogsUsers((int)update.CallbackQuery.From.Id)[0].id;
+                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, dogDAO.GetDog(idDog).DogInfo(), replyMarkup: BotControlButtons.SelectDogStatus("0R"));
+                        
+                        break;
+
                     case "1":
-                        Console.WriteLine("Пес1");
+                        idDog = dogDAO.GetAllDogsUsers((int)update.CallbackQuery.From.Id)[1].id;
+                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, dogDAO.GetDog(idDog).DogInfo(), replyMarkup: BotControlButtons.SelectDogStatus("1R"));
+
                         break;
                     case "2":
-                        Console.WriteLine("Пес2");
+                        idDog = dogDAO.GetAllDogsUsers((int)update.CallbackQuery.From.Id)[2].id;
+                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, dogDAO.GetDog(idDog).DogInfo(), replyMarkup: BotControlButtons.SelectDogStatus("2R"));
                         break;
                     case "3":
-                        Console.WriteLine("Пес3");
+                        idDog = dogDAO.GetAllDogsUsers((int)update.CallbackQuery.From.Id)[3].id;
+                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, dogDAO.GetDog(idDog).DogInfo(), replyMarkup: BotControlButtons.SelectDogStatus("3R"));                        
                         break;
                     case "4":
-                        Console.WriteLine("Пес4");
+                        idDog = dogDAO.GetAllDogsUsers((int)update.CallbackQuery.From.Id)[4].id;
+                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, dogDAO.GetDog(idDog).DogInfo(), replyMarkup: BotControlButtons.SelectDogStatus("4R"));
                         break;
                     case "5":
-                        Console.WriteLine("Пес5");
+                        idDog = dogDAO.GetAllDogsUsers((int)update.CallbackQuery.From.Id)[5].id;
+                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, dogDAO.GetDog(idDog).DogInfo(), replyMarkup: BotControlButtons.SelectDogStatus("5R"));
                         break;
                     case "6":
-                        Console.WriteLine("Пес6");
+                        idDog = dogDAO.GetAllDogsUsers((int)update.CallbackQuery.From.Id)[6].id;
+                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, dogDAO.GetDog(idDog).DogInfo(), replyMarkup: BotControlButtons.SelectDogStatus("6R"));
                         break;
                     case "7":
-                        Console.WriteLine("Пес7");
+                        idDog = dogDAO.GetAllDogsUsers((int)update.CallbackQuery.From.Id)[7].id;
+                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, dogDAO.GetDog(idDog).DogInfo(), replyMarkup: BotControlButtons.SelectDogStatus("7R"));
                         break;
                     case "8":
-                        Console.WriteLine("Пес8");
+                        idDog = dogDAO.GetAllDogsUsers((int)update.CallbackQuery.From.Id)[8].id;
+                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, dogDAO.GetDog(idDog).DogInfo(), replyMarkup: BotControlButtons.SelectDogStatus("8R"));
                         break;
                     case "9":
-                        Console.WriteLine("Пес9");
+                        idDog = dogDAO.GetAllDogsUsers((int)update.CallbackQuery.From.Id)[3].id;
+                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, dogDAO.GetDog(idDog).DogInfo(), replyMarkup: BotControlButtons.SelectDogStatus("9R"));
+                        break;
+                    case "0R":
+                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, "Введите имя собаке");
+                        //Добавляем собаку в очередь на переименовку
+                        dogDAO.AddQueue((int)update.CallbackQuery.From.Id, 0);
+                        break;
+                    case "1R":
+                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, "Введите имя собаке");
+                        //Добавляем собаку в очередь на переименовку
+                        dogDAO.AddQueue((int)update.CallbackQuery.From.Id, 1);
+                        break;
+                    case "2R":
+                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, "Введите имя собаке");
+                        //Добавляем собаку в очередь на переименовку
+                        dogDAO.AddQueue((int)update.CallbackQuery.From.Id, 2);
+                        break;
+                    case "3R":
+                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, "Введите имя собаке");
+                        //Добавляем собаку в очередь на переименовку
+                        dogDAO.AddQueue((int)update.CallbackQuery.From.Id, 3);
+                        break;
+                    case "4R":
+                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, "Введите имя собаке");
+                        //Добавляем собаку в очередь на переименовку
+                        dogDAO.AddQueue((int)update.CallbackQuery.From.Id, 4);
+                        break;
+                    case "5R":
+                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, "Введите имя собаке");
+                        //Добавляем собаку в очередь на переименовку
+                        dogDAO.AddQueue((int)update.CallbackQuery.From.Id, 5);
+                        break;
+                    case "6R":
+                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, "Введите имя собаке");
+                        //Добавляем собаку в очередь на переименовку
+                        dogDAO.AddQueue((int)update.CallbackQuery.From.Id, 6);
+                        break;
+                    case "7R":
+                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, "Введите имя собаке");
+                        //Добавляем собаку в очередь на переименовку
+                        dogDAO.AddQueue((int)update.CallbackQuery.From.Id, 7);
+                        break;
+                    case "8R":
+                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, "Введите имя собаке");
+                        //Добавляем собаку в очередь на переименовку
+                        dogDAO.AddQueue((int)update.CallbackQuery.From.Id, 8);
+                        break;
+                    case "9R":
+                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, "Введите имя собаке");
+                        //Добавляем собаку в очередь на переименовку
+                        dogDAO.AddQueue((int)update.CallbackQuery.From.Id, 9);
+
                         break;
 
                 }

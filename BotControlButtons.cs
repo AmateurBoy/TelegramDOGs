@@ -37,7 +37,7 @@ namespace TelegramDOGs
         }        
         public static IReplyMarkup GetBuy()
         {
-            return new InlineKeyboardMarkup(new InlineKeyboardButton("Для покупки") { Text = "Купить",CallbackData="2"}) ;
+            return new InlineKeyboardMarkup(new InlineKeyboardButton("Для покупки") { Text = "Купить",CallbackData= "Buy energy in the store" }) ;
         }
         public static IReplyMarkup GetDogButton(List<Dog>Dogs)
         {
@@ -68,6 +68,14 @@ namespace TelegramDOGs
             var keybord = new InlineKeyboardMarkup(IKB);
             return keybord;
            
+        }
+        public static IReplyMarkup SelectDogStatus(string selectIndexDog)
+        {
+            List<List<InlineKeyboardButton>> IKB = new List<List<InlineKeyboardButton>>();
+            IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("ава") { Text = $"Переименовать Собаку", CallbackData = $"{selectIndexDog}" }, new InlineKeyboardButton("Характеристика") { Text = $"Характеристики собаки", CallbackData = $"21312" } });
+            IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("віаів") { Text = $"Покормить собаку", CallbackData = $"3123" }, new InlineKeyboardButton("Продать") { Text = $"Продать(в разработке)", CallbackData = $"13123" } });
+            var keybord = new InlineKeyboardMarkup(IKB);
+            return keybord;
         }
 
     }

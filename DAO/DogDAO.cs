@@ -35,6 +35,59 @@ namespace TelegramDOGs
             }
             
         }
+        #region QueueDogEdit
+        public void AddQueue(int idUser, int idDog)
+        {
+            MySqlCommand command = new MySqlCommand($"INSERT INTO `renamequeue`(`idDog`, `idUser`) VALUES (@idDog,@idUser)", DB.GetConnection());
+            command.Parameters.Add("@idDog", MySqlDbType.Int32).Value = idDog;
+            command.Parameters.Add("@idUser", MySqlDbType.Int32).Value = idUser;
+            if (command.ExecuteNonQuery() == 1)
+            {
+                Console.WriteLine("Удачно добавлено в очередь");
+            }
+
+        }
+        public void DelQueue(int idDog)
+        {
+            MySqlCommand command = new MySqlCommand($" DELETE FROM `renamequeue` WHERE `idDog`={idDog}", DB.GetConnection());
+            if (command.ExecuteNonQuery() == 1)
+            {
+                Console.WriteLine("Удаление из очереди успешно");
+            }
+        }
+        public int idDog(int userId)
+        {
+            DataTable table = new DataTable();
+            MySqlDataAdapter adapter = new MySqlDataAdapter();
+            MySqlCommand command = new MySqlCommand($"SELECT `idDog` FROM `renamequeue` WHERE `idUser`=@idUser", DB.GetConnection());
+            command.Parameters.Add("@idUser", MySqlDbType.Int32).Value = userId;
+            adapter.SelectCommand = command;
+            adapter.Fill(table);
+            if (table.Rows.Count > 0)
+            {
+                int idDOg = -1;
+                idDOg= (int)table.Rows[0].ItemArray[0];
+                return idDOg; 
+            }
+            else
+            {
+                return -1;
+            }
+
+        }
+        public void EditNameDogs(string NewName ,int userId)
+        {
+            int indexDog = idDog(userId);
+            if (indexDog >= 0)
+            {
+                GetAllDogsUsers(userId)[indexDog].name=NewName;
+                UpdataDog(NewName, GetAllDogsUsers(userId)[indexDog].id);
+                DelQueue(indexDog);
+                Console.WriteLine("Успешное переиминование> " + NewName);
+            }
+            
+        }
+        #endregion
         public void Dispose()
         {
             DB.CloseConnection();
@@ -140,6 +193,19 @@ namespace TelegramDOGs
                 dog = IncealizatorDog(item.ItemArray);
             }
             return dog;
+        }
+        public async void UpdataDog(string name,int dogId)
+        {
+            
+            
+            MySqlCommand command = new MySqlCommand($"UPDATE `dogs` SET `name`=@name WHERE `id`={dogId}", DB.GetConnection());
+            command.Parameters.Add("@name", MySqlDbType.VarChar).Value = name;
+           
+            if (command.ExecuteNonQuery() == 1)
+            {
+                if (AdminClass.ActivChat == false)
+                    Console.WriteLine("Имя обновлено");
+            }
         }
         public Dog IncealizatorDog(object[] obj)
         {
