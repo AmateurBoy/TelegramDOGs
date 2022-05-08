@@ -12,6 +12,7 @@ namespace TelegramDOGs
             List<List<KeyboardButton>> KeyboardButtonTest = new List<List<KeyboardButton>>();
             KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("Найти собаку"), new KeyboardButton("Мой Профиль")});
             KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("Магазин"), new KeyboardButton("Лучшие игроки")});
+            KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("Подробнее об игре")});
             var keybord = new ReplyKeyboardMarkup(KeyboardButtonTest);
             keybord.ResizeKeyboard = true;
             return keybord;
@@ -19,7 +20,7 @@ namespace TelegramDOGs
         public static IReplyMarkup GetButtonMyStatus()
         {
             List<List<KeyboardButton>> KeyboardButtonTest = new List<List<KeyboardButton>>();
-            KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("Мои Собаки"), new KeyboardButton("Мой профиль") });
+            KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("Мои Собаки"), new KeyboardButton("Мой Профиль") });
             KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("Главное меню"), new KeyboardButton("Магазин") });
             var keybord = new ReplyKeyboardMarkup(KeyboardButtonTest);
             keybord.ResizeKeyboard = true;
@@ -42,19 +43,26 @@ namespace TelegramDOGs
         {
             List<List<InlineKeyboardButton>> IKB = new List<List<InlineKeyboardButton>>();
             int countRows = 0;
+           
             countRows = Dogs.Count / 2;
-            for (int i = 0; i < Dogs.Count; i++)
+            for (int i = 0,j=0; i < Dogs.Count; i++)
             {
                 
                 if(countRows>=i)
-                {                    
-                    IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("Имя собаки") { Text = $"{Dogs[i].name}", CallbackData = $"{ i }" } ,new InlineKeyboardButton("Имя собаки") { Text = $"{Dogs[i+1].name}", CallbackData = $"{i+1}" } });
+                { 
+                    if(j==Dogs.Count-1)
+                    {
+                        IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("Имя собаки") { Text = $"{Dogs[j].name}", CallbackData = $"{j}" } });
+                        break;
+                    }
+                    if(j>=Dogs.Count)
+                    {
+                        break;
+                    }
+                    IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("Имя собаки") { Text = $"{Dogs[j].name}", CallbackData = $"{ j }" }, new InlineKeyboardButton("Имя собаки") { Text = $"{Dogs[j + 1].name}", CallbackData = $"{j + 1}" } });
+                    j += 2;
                 }
-                else
-                {
-                    IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("Имя собаки") { Text = $"{Dogs[i].name}", CallbackData = $"{i}" } });
-                    break;
-                }
+               
                                 
             }
             var keybord = new InlineKeyboardMarkup(IKB);

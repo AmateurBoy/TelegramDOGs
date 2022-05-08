@@ -18,6 +18,7 @@ namespace TelegramDOGs
 {
     class Program
     {
+        static string GameRulesText = "";
 
         public static ProccesServec proccesAPI = ProccesServec.GetProccesAPI();
         
@@ -72,6 +73,9 @@ namespace TelegramDOGs
                                         await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.CreateNewUser(userDAO.CreateNewUser((int)message.Chat.Id, message.Chat.FirstName))}");
                                         await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.GetUserByID((int)message.Chat.Id).GetAllStatus()}");
 
+                                        break;
+                                    case "Правила":
+                                        await botClient.SendTextMessageAsync(message.Chat, $"{GameRulesText}", replyMarkup: BotControlButtons.GetButtonMainMenu());
                                         break;
                                     case "Мой Профиль":
                                         await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.GetUserByID((int)message.Chat.Id).GetAllStatus()}", replyMarkup: BotControlButtons.GetButtonMyStatus());
@@ -130,34 +134,34 @@ namespace TelegramDOGs
                 switch (update.CallbackQuery.Data)
                 {
                     case"0":
-                        Console.WriteLine("Член нажат");
+                        Console.WriteLine("Пес0");
                         break;
                     case "1":
-                        Console.WriteLine("Член нажат");
+                        Console.WriteLine("Пес1");
                         break;
                     case "2":
-                        Console.WriteLine("Член нажат");
+                        Console.WriteLine("Пес2");
                         break;
                     case "3":
-                        Console.WriteLine("Член нажат");
+                        Console.WriteLine("Пес3");
                         break;
                     case "4":
-                        Console.WriteLine("Член нажат");
+                        Console.WriteLine("Пес4");
                         break;
                     case "5":
-                        Console.WriteLine("Член нажат");
+                        Console.WriteLine("Пес5");
                         break;
                     case "6":
-                        Console.WriteLine("Член нажат");
+                        Console.WriteLine("Пес6");
                         break;
                     case "7":
-                        Console.WriteLine("Член нажат");
+                        Console.WriteLine("Пес7");
                         break;
                     case "8":
-                        Console.WriteLine("Член нажат");
+                        Console.WriteLine("Пес8");
                         break;
                     case "9":
-                        Console.WriteLine("Член нажат");
+                        Console.WriteLine("Пес9");
                         break;
 
                 }
