@@ -86,9 +86,6 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
         }
         else
             return "Акаунт уже зарегестрирован.";
-                
-            
-            
     }
     public void DeleteUser(User user)
     {
@@ -189,17 +186,21 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
         adapter.SelectCommand = Command;
         adapter.Fill(table);
         User user = new User();
+        user.Id = ID;
+        user.Name = "Ноу нейм";
         if (table.Rows.Count>0)
         {
                 foreach (DataRow item in table.Rows)
                 {
                     user = InitializationUser(item.ItemArray);
                 }
+                return user;
+            }
+        else
+        {
+                CreateNewUser(user);
+                return GetUserByID(user.Id);
         }
-      
-        
-        
-        return user;
     }
     public bool IsAcaunt(long ID)
     {

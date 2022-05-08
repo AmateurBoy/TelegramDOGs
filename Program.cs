@@ -90,7 +90,7 @@ namespace TelegramDOGs
                                     case "Купить собаку":
                                         break;
                                     case "Найти собаку":
-                                        await botClient.SendTextMessageAsync(message.Chat, $"{dogDAO.CreatDogRandom((int)message.Chat.Id)}", replyMarkup: GetButton());
+                                        await botClient.SendTextMessageAsync(message.Chat, $"{dogDAO.CreatDogRandom(userDAO.GetUserByID((int)message.Chat.Id))}", replyMarkup: GetButton());
                                         break;
                                     case "/reg":
                                         await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.CreateNewUser(userDAO.CreateNewUser((int)message.Chat.Id, message.Chat.FirstName))}", replyMarkup: GetButton());
@@ -129,9 +129,37 @@ namespace TelegramDOGs
                 //оброботка CallbackQuery
                 switch (update.CallbackQuery.Data)
                 {
-                    case"2":
+                    case"0":
                         Console.WriteLine("Член нажат");
                         break;
+                    case "1":
+                        Console.WriteLine("Член нажат");
+                        break;
+                    case "2":
+                        Console.WriteLine("Член нажат");
+                        break;
+                    case "3":
+                        Console.WriteLine("Член нажат");
+                        break;
+                    case "4":
+                        Console.WriteLine("Член нажат");
+                        break;
+                    case "5":
+                        Console.WriteLine("Член нажат");
+                        break;
+                    case "6":
+                        Console.WriteLine("Член нажат");
+                        break;
+                    case "7":
+                        Console.WriteLine("Член нажат");
+                        break;
+                    case "8":
+                        Console.WriteLine("Член нажат");
+                        break;
+                    case "9":
+                        Console.WriteLine("Член нажат");
+                        break;
+
                 }
             }
         }
