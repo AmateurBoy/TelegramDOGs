@@ -5,6 +5,9 @@ using System.Data;
 using System.Text;
 using TelegramDOGs.Entity;
 using MySql.Data;
+using System.Threading;
+
+using ConsoleTestGI;
 
 namespace TelegramDOGs.DAO
 {
@@ -15,8 +18,21 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
     private static UserDAO Instens;
     private UserDAO()
     {
-        DB = new DataBase();
-        DB.OpenConnection();
+        try
+        {
+            DB = new DataBase();
+            DB.OpenConnection();
+        }
+        catch
+        {
+            Console.WriteLine("Создать UserDAO не удалось попытка повториться через 20 секунд...");            
+            ProccesServec procces = ProccesServec.GetProccesAPI();
+            procces.StartServer();
+            Thread.Sleep(20000);
+            DB = new DataBase();
+            DB.OpenConnection();
+
+        }        
     }
      ~UserDAO()
     {
@@ -33,9 +49,6 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
     #endregion
     private DataBase DB;
 
-    private Dictionary<int, User> UsersCash = new Dictionary<int, User>();
-    private bool CashValid;
-        
     public User CreateNewUser(int id, string name)
     {
         User user = new User();
@@ -45,7 +58,7 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
     }
     public string CreateNewUser(User user)
     {
-        string result;
+        
         if (IsAcaunt(Convert.ToInt64(user.Id))==false)
         {
             MySqlCommand Command = new MySqlCommand($"INSERT INTO `users` (`id`, `name`, `countDogs`, `money`, `EnergeUser`, `eat`, `rating`, `DateUpdate`) VALUES (@ID, @UserName,@countDogs,@money,@EnergeUser,@Eat,@rating,@DataUpdate)", DB.GetConnection());
@@ -63,19 +76,16 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
 
                 Console.WriteLine("Регестрация успешна");
                 
-                return result = "Регестрация успешна";
+                return "Регестрация успешна";
             }
             else
             {
                 Console.WriteLine("С регестрацией что то не то");
-                return result = "С регестрацией что то не то";
+                return "С регестрацией что то не то";
             }
         }
         else
-            return result = "Акаунт уже зарегестрирован.";
-                
-            
-            
+            return "Акаунт уже зарегестрирован.";
     }
     public void DeleteUser(User user)
     {
@@ -84,42 +94,90 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
     public void UpdateUser(User user)
       {
             
-         
-         double multsuma = 0;
-            if(user.Dogs!=null)
+         if(user.Id!=0)
             {
-                foreach (Dog item in user.Dogs)
+                double multsuma = 0;
+                if (user.Dogs != null)
                 {
-                    multsuma += item.multiplier; 
+                    foreach (Dog item in user.Dogs)
+                    {
+                        multsuma += item.multiplier;
+                    }
+
+                    double dohod = multsuma * DateTime.Now.Subtract(user.DataUpdate).TotalSeconds;
+                    user.money += (multsuma * DateTime.Now.Subtract(user.DataUpdate).TotalSeconds);
+                    if((int)DateTime.Now.Subtract(user.DataUpdate).TotalSeconds/60>=100)
+                    {
+                        user.EnergyUser = 100;
+                    }
+                    else
+                    {
+                        if(user.EnergyUser<100)
+                        user.EnergyUser += (int)DateTime.Now.Subtract(user.DataUpdate).TotalSeconds / 60;
+                    }
+
                 }
 
-                double dohod =  multsuma * DateTime.Now.Subtract(user.DataUpdate).TotalSeconds;
-                user.money +=  (multsuma * DateTime.Now.Subtract(user.DataUpdate).TotalSeconds);
-                
-                Console.WriteLine($"Dohod {dohod}/{DateTime.Now.Subtract(user.DataUpdate).TotalSeconds}");
-                
-            }        
-            string ConvertorSQL()
-            {
-                string S = string.Format("{0:d2}-{1:d2}-{2:d2} {3:d2}:{4:d2}:{5:d2}",DateTime.Now.Year,DateTime.Now.Month,DateTime.Now.Day,DateTime.Now.Hour,DateTime.Now.Minute,DateTime.Now.Second);
-                return S;
-            }
-           
-            MySqlCommand command = new MySqlCommand($"UPDATE `users` SET `money`=@money,`countDogs`=@countDogs,`DateUpdate`=@DataUpdate WHERE `id`=@id", DB.GetConnection());
-            command.Parameters.Add("@DataUpdate", MySqlDbType.DateTime).Value = DateTime.Now;
-            command.Parameters.Add("@money", MySqlDbType.Double).Value = user.money;
-            command.Parameters.Add("@countDogs", MySqlDbType.Int32).Value = user.Dogs.Count;
-            command.Parameters.Add("@id", MySqlDbType.Int32).Value =user.Id;
+
+                MySqlCommand command = new MySqlCommand($"UPDATE `users` SET `money`=@money,`countDogs`=@countDogs,`DateUpdate`=@DataUpdate,`EnergeUser`=@Energy WHERE `id`=@id", DB.GetConnection());
+                command.Parameters.Add("@DataUpdate", MySqlDbType.DateTime).Value = DateTime.Now;
+                command.Parameters.Add("@money", MySqlDbType.Double).Value = user.money;
+                command.Parameters.Add("@countDogs", MySqlDbType.Int32).Value = user.Dogs.Count;
+                command.Parameters.Add("@id", MySqlDbType.Int32).Value = user.Id;
+                command.Parameters.Add("@Energy", MySqlDbType.Int32).Value = user.EnergyUser;
 
 
-            if (command.ExecuteNonQuery() == 1)
-            {
-                Console.WriteLine("Обновлено");
+                if (command.ExecuteNonQuery() == 1)
+                {
+                    if (AdminClass.ActivChat == false)
+                        Console.WriteLine("Обновлено");
+                }
+
             }
 
 
         }
-         
+    public string Statistic()
+    {
+            DataTable table = new DataTable();
+            MySqlDataAdapter adapter = new MySqlDataAdapter();
+            MySqlCommand Command = new MySqlCommand($"SELECT * FROM `users` ORDER BY `users`.`money` DESC", DB.GetConnection());
+            adapter.SelectCommand = Command;
+            adapter.Fill(table);
+            string result = "";
+            int count = 0;
+            string Winer(int i)
+            {
+                switch(i)
+                {
+                    case 1:
+                        return "🥇";
+                        break;
+                    case 2:
+                        return "🥈";
+                        break;
+                    case 3:
+                        return "🥉";
+                        break;
+                    default:
+                        return "🗿";
+                        break;
+                }
+                
+            }
+            foreach (DataRow item in table.Rows)
+            {
+                count++;
+                if(count>5)
+                {
+                    break;
+                }
+                result += $"{Winer(count)} {count}. Имя: {item.ItemArray[1]}." +
+                    $"\nDogs: {item.ItemArray[2]}" +
+                    $"\nMoney:{Convert.ToDouble(item.ItemArray[3])}\n\n";
+            }
+            return result;
+        }
     public User GetUserByID(int ID)
     {
         DataTable table = new DataTable();
@@ -127,19 +185,24 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
         MySqlCommand Command = new MySqlCommand($"SELECT * FROM `users` WHERE `id`={ID}", DB.GetConnection());
         adapter.SelectCommand = Command;
         adapter.Fill(table);
-        if(table.Rows.Count>0)
-        {
-                    
-        }
         User user = new User();
-        foreach (DataRow item in table.Rows)
+        user.Id = ID;
+        user.Name = "Ноу нейм";
+        if (table.Rows.Count>0)
         {
-            user = InitializationUser(item.ItemArray);
+                foreach (DataRow item in table.Rows)
+                {
+                    user = InitializationUser(item.ItemArray);
+                }
+                return user;
+            }
+        else
+        {
+                CreateNewUser(user);
+                return GetUserByID(user.Id);
         }
-        
-        return user;
     }
-    private bool IsAcaunt(long ID)
+    public bool IsAcaunt(long ID)
     {
         DataTable table = new DataTable();
         MySqlDataAdapter adapter = new MySqlDataAdapter();

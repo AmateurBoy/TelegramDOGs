@@ -6,18 +6,18 @@ using System.Threading;
 
 namespace ConsoleTestGI
 {
-    public class ProccesAPI
+    public class ProccesServec
     {
         public Process process;
-        private static ProccesAPI Instance;
-        private ProccesAPI() { }
-        public  static ProccesAPI GetProccesAPI()
+        private static ProccesServec Instance;
+        private ProccesServec() { }
+        public  static ProccesServec GetProccesAPI()
         {
             if (Instance == null)
-                Instance = new ProccesAPI();      
+                Instance = new ProccesServec();      
             return Instance;            
         }
-        public void StartServer()
+       public void StartServer()
         {
             Console.WriteLine("Попытка запуска");
             if (process == null)

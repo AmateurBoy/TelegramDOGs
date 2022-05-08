@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Text;
 using TelegramDOGs.Entity;
 using System.Data;
-
+using System.Threading;
+using ConsoleTestGI;
+using TelegramDOGs.DAO;
 
 namespace TelegramDOGs
 {
@@ -17,8 +19,21 @@ namespace TelegramDOGs
         private static DogDAO Instens;
         private DogDAO()
         {
-            DB = new DataBase();
-            DB.OpenConnection();
+            try
+            {
+                DB = new DataBase();
+                DB.OpenConnection();
+            }
+            catch
+            {
+                Console.WriteLine("Не удалось создать DogDAO отсутсвует подключение к базеданних повторная попытка через 20 секунд...");
+                ProccesServec procces = ProccesServec.GetProccesAPI();
+                procces.StartServer();
+                Thread.Sleep(20000);
+                DB = new DataBase();
+                DB.OpenConnection();
+            }
+            
         }
         public void Dispose()
         {
@@ -33,25 +48,69 @@ namespace TelegramDOGs
             return Instens;
         }
         #endregion
-        public string CreatDogRandom(int UserId)
-        {
+        public string CreatDogRandom(User user)
+         {
+            
+
+            int Energy = 0;
+            int countDog = 0;
             Random R = new Random();
-            if (R.Next(0, 100) < 20)
+            MySqlDataAdapter Adapter = new MySqlDataAdapter();
+            MySqlCommand CommandEnergySelect = new MySqlCommand($"SELECT `countDogs`,`EnergeUser` FROM `users` WHERE `id`={user.Id}", DB.GetConnection());
+           
+            DataTable table = new DataTable();            
+            Adapter.SelectCommand = CommandEnergySelect;
+            Adapter.Fill(table);
+            if (table.Rows.Count>0)
             {
-                MySqlDataAdapter adapter = new MySqlDataAdapter();
-                Dog dog = new Dog(R.Next(0,999999), "ДворнягаСимпатяга", (byte)R.Next(0, 85), (byte)R.Next(0, 10), R.Next(3, 25));
+                foreach (DataRow item in table.Rows)
+                {
+                    countDog = (int)item.ItemArray[0];
+                    Energy = (int)item.ItemArray[1];
+                    
+                }
+                if(countDog==10)
+                {
+                    return "У вас максимальный лимит, свора из 10 собак";
+                }
+                else
+                {
+                    if (Energy >= 10)
+                    {
+                        MySqlCommand CommandEnergyUpdate = new MySqlCommand($"UPDATE `users` SET `EnergeUser`=@SetEnergy WHERE `id`={user.Id}", DB.GetConnection());
+                        Energy -= 10;
+                        CommandEnergyUpdate.Parameters.Add("@SetEnergy", MySqlDbType.Double).Value = Energy;
+                        Adapter.SelectCommand = CommandEnergyUpdate;
+                        if (CommandEnergyUpdate.ExecuteNonQuery() == 1)
+                        {
+                            if (R.Next(0, 100) < 20)
+                            {
+                                MySqlDataAdapter adapter = new MySqlDataAdapter();
+                                Dog dog = new Dog(R.Next(0, 999999), "ДворнягаСимпатяга", (byte)R.Next(0, 85), (byte)R.Next(0, 10), R.Next(3, 25));
+
+                                MySqlCommand command = new MySqlCommand($"INSERT INTO `dogs`(`id`,`age`, `name`, `typedog`, `satiety`, `hp`, `lvl`, `Endurance`, `Agility`, `Intelligence`, `userid`, `multiplier`,`regDoguser`) VALUES ('{dog.id}','{dog.age}','{dog.name}','{dog.TypeDogString}','{dog.satiety}','{dog.HP}','{dog.lvl}','{dog.Endurance}','{dog.Agility}','{dog.Intelligence}','{user.Id}',@multiplier,@DataUpdate)", DB.GetConnection());
+                                command.Parameters.Add("@DataUpdate", MySqlDbType.Date).Value = DateTime.Now;
+                                command.Parameters.Add("@multiplier", MySqlDbType.Double).Value = dog.multiplier;
+                                adapter.SelectCommand = command;
+                                if (command.ExecuteNonQuery() == 1)
+                                { }
+
+                                return $"найдена собака породы {dog.TypeDogString}";
+                            }
+                            else return $"Поиск обернулся ничем";
+                        }
+                        return "";
+                    }
+                    else
+                    {
+                        return "Недостаточно енергии...";
+                    }
+                }
                 
-                MySqlCommand command = new MySqlCommand($"INSERT INTO `dogs`(`id`,`age`, `name`, `typedog`, `satiety`, `hp`, `lvl`, `Endurance`, `Agility`, `Intelligence`, `userid`, `multiplier`,`regDoguser`) VALUES ('{dog.id}','{dog.age}','{dog.name}','{dog.TypeDogString}','{dog.satiety}','{dog.HP}','{dog.lvl}','{dog.Endurance}','{dog.Agility}','{dog.Intelligence}','{UserId}',@multiplier,@DataUpdate)", DB.GetConnection());
-                command.Parameters.Add("@DataUpdate", MySqlDbType.Date).Value = DateTime.Now;
-                command.Parameters.Add("@multiplier", MySqlDbType.Double).Value = dog.multiplier;
-                adapter.SelectCommand = command;
-                if(command.ExecuteNonQuery() == 1)
-                { }    
-
-                return $"найдена собака породи {dog.TypeDogString}";
+                
+                
             }
-            else return $"Поиск обернулся нечем";
-
+            return "Ошибочка";
 
         }
         public List<Dog> GetAllDogsUsers(int userId)
