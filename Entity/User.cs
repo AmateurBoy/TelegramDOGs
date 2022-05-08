@@ -31,25 +31,7 @@ namespace TelegramDOGs.Entity
             result += $"⚡ Ваша енергия:{Convert.ToString(this.EnergyUser)}\n";
             result += $"🍎 Ваш запас еды:{Convert.ToString(this.eat)}\n";
             result += $"📈 Ваш рейтинг:{Convert.ToString(this.rating)}\n";
-            result += $"🐶 Всего собак:{Convert.ToString(this.countDog)}\n";
-            result += $"🐶 Ваши собаки: ";
-            if(Dogs!=null)
-            {
-                foreach (var item in Dogs)
-                {
-                    count++;
-                    if(count>10)
-                    {
-                        result += "\n и остальные...";
-                        break;
-                    }
-                    else
-                    {
-                        result += $"{item.name}, ";
-                    }
-                    
-                }
-            }
+            result += $"🐶 Всего собак:{Convert.ToString(this.countDog)}\n";            
              
             return result;
         }

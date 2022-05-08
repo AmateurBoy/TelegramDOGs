@@ -26,7 +26,7 @@ namespace TelegramDOGs
             catch
             {
                 Console.WriteLine("Не удалось создать DogDAO отсутсвует подключение к базеданних повторная попытка через 20 секунд...");
-                ProccesAPI procces = ProccesAPI.GetProccesAPI();
+                ProccesServec procces = ProccesServec.GetProccesAPI();
                 procces.StartServer();
                 Thread.Sleep(20000);
                 DB = new DataBase();

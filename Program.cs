@@ -19,7 +19,7 @@ namespace TelegramDOGs
     class Program
     {
 
-        public static ProccesAPI proccesAPI = ProccesAPI.GetProccesAPI();
+        public static ProccesServec proccesAPI = ProccesServec.GetProccesAPI();
         
         public static UserDAO userDAO = UserDAO.GetInstens();
         public static DogDAO dogDAO = DogDAO.GetInstens();
@@ -61,9 +61,6 @@ namespace TelegramDOGs
                     {
                         case Telegram.Bot.Types.Enums.UpdateType.Message:
                             {
-
-
-
                                 if (message.Photo != null)
                                 {
                                     await botClient.SendTextMessageAsync(message.Chat.Id, "Фотка зачёт");
@@ -77,8 +74,11 @@ namespace TelegramDOGs
 
                                         break;
                                     case "Мой Профиль":
-                                        await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.GetUserByID((int)message.Chat.Id).GetAllStatus()}", replyMarkup: GetButton());
+                                        await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.GetUserByID((int)message.Chat.Id).GetAllStatus()}", replyMarkup: BotControlButtons.GetButtonMyStatus());
                                         break;
+                                    case "Мои Собаки":
+                                        await botClient.SendTextMessageAsync(message.Chat, $"Ваши собаки:", replyMarkup: BotControlButtons.GetDogButton(userDAO.GetUserByID((int)message.Chat.Id).Dogs));
+                                        break;                                    
                                     case "Главное меню":
                                         await botClient.SendTextMessageAsync(message.Chat, $"Магазин => Главное меню", replyMarkup: GetButton());
                                         break;
@@ -108,12 +108,11 @@ namespace TelegramDOGs
                                 break;
                             }
                         case Telegram.Bot.Types.Enums.UpdateType.EditedMessage:
-                            {
-                                var edited_message = update.EditedMessage;
-                                await botClient.SendTextMessageAsync(edited_message.Chat, "Опа кто то изменил сообщение извени я такое не понимаю...");
-                                break;
-                            }
-
+                        {
+                            var edited_message = update.EditedMessage;
+                            await botClient.SendTextMessageAsync(edited_message.Chat, "Опа кто то изменил сообщение извени я такое не понимаю...");
+                            break;
+                        }
                     }
                 }
                 else
@@ -122,11 +121,6 @@ namespace TelegramDOGs
                     {
                         await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.CreateNewUser(userDAO.CreateNewUser((int)message.Chat.Id, message.Chat.FirstName))}");
                         await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.GetUserByID((int)message.Chat.Id).GetAllStatus()}");
-                    }
-
-                    else
-                    {
-
                     }
                 }
             }
@@ -139,20 +133,8 @@ namespace TelegramDOGs
                         Console.WriteLine("Член нажат");
                         break;
                 }
-                   
-                
             }
-            else
-            {
-                
-            }
-           
-           
-            
-
-            
-                
-            }
+        }
 
         private static IReplyMarkup GetButton()
         {
@@ -164,39 +146,27 @@ namespace TelegramDOGs
             return keybord;
         }
         
-        public static async Task AdminMessage(ITelegramBotClient botClient)
-            {
-                Console.WriteLine("Введите ID Пользователя:");
-                long ID = long.Parse(Console.ReadLine());
-                Console.WriteLine($"Введите сообщение которое нужно оптавить юзеру");
-                string Text = Console.ReadLine();
-                await botClient.SendTextMessageAsync(ID,Text);
-            }        
-
         public static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
-            {
-                
-                 Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(exception));
-            }
+        {  
+            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(exception));
+        }
         static void Main(string[] args)
-         {
-                proccesAPI.StartServer();      
-                Console.WriteLine("Запущен бот " + bot.GetMeAsync().Result.FirstName);
-                
-                
-                var cts = new CancellationTokenSource();
-                var cancellationToken = cts.Token;
-                var receiverOptions = new ReceiverOptions
-                {
-                    AllowedUpdates = { }, 
-                };
-                bot.StartReceiving(
-                    HandleUpdateAsync,
-                    HandleErrorAsync,
-                    receiverOptions,
-                    cancellationToken
-                );
-
+        {
+            proccesAPI.StartServer();
+            Console.WriteLine("Запущен бот " + bot.GetMeAsync().Result.FirstName);
+            
+            var cts = new CancellationTokenSource();
+            var cancellationToken = cts.Token;
+            var receiverOptions = new ReceiverOptions
+            {
+                AllowedUpdates = { }, 
+            };
+            bot.StartReceiving(
+                HandleUpdateAsync,
+                HandleErrorAsync,
+                receiverOptions,
+                cancellationToken
+            );
             
             bool ServerActiv = true;  
             while (ServerActiv)
@@ -204,7 +174,7 @@ namespace TelegramDOGs
                 ConsoleKeyInfo key;
                 key = Console.ReadKey();
                 
-                    if (key.Key == ConsoleKey.End)
+                if (key.Key == ConsoleKey.End)
                 {
                     Console.WriteLine("AdminMessageActiv" +
                         "" +
@@ -212,7 +182,6 @@ namespace TelegramDOGs
                         "" +
                         "=========================================");
                     AdminClass.AdminChat(bot);
-
                 }
                 if(key.Key == ConsoleKey.Home)
                 {
@@ -229,7 +198,7 @@ namespace TelegramDOGs
                 {
                     proccesAPI.StopServer();
                 }
-                 if(key.Key==ConsoleKey.Delete)
+                if(key.Key==ConsoleKey.Delete)
                 {
                     DB.OpenConnection();
                     string idadmina = "683008996";
@@ -241,13 +210,8 @@ namespace TelegramDOGs
                         Console.WriteLine("Админ удален");
                     }
                     DB.CloseConnection();
-                    
                 }
             }
-               
-                
-
-
         }
     }
 }
