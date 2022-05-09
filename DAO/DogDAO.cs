@@ -13,6 +13,8 @@ namespace TelegramDOGs
    
     class DogDAO
     {
+        enum NameDogShop { Дарман, Цезарь, Одиссей, Эмир, Эйс, Локи, Спарки, Олли, Валли, Бєтмен, Альберт, Нора, Дино, Джек, Оливер, Молли, Витти , Тайни , Эрнест , Честер , Монро , Тото };
+        
         DataBase DB;
         #region Singltone
 
@@ -35,6 +37,17 @@ namespace TelegramDOGs
             }
             
         }
+        
+       
+        public static DogDAO GetInstens()
+        {
+            if (Instens == null)
+            {
+                Instens = new DogDAO();
+            }
+            return Instens;
+        }
+        #endregion
         #region QueueDogEdit
         public void AddQueue(int idUser, int idDog)
         {
@@ -66,8 +79,8 @@ namespace TelegramDOGs
             if (table.Rows.Count > 0)
             {
                 int idDOg = -1;
-                idDOg= (int)table.Rows[0].ItemArray[0];
-                return idDOg; 
+                idDOg = (int)table.Rows[0].ItemArray[0];
+                return idDOg;
             }
             else
             {
@@ -75,32 +88,51 @@ namespace TelegramDOGs
             }
 
         }
-        public void EditNameDogs(string NewName ,int userId)
+        public void EditNameDogs(string NewName, int userId)
         {
             int indexDog = idDog(userId);
             if (indexDog >= 0)
             {
-                GetAllDogsUsers(userId)[indexDog].name=NewName;
-                UpdataDog(NewName, GetAllDogsUsers(userId)[indexDog].id);
+                GetAllDogsUser(userId)[indexDog].name = NewName;
+                UpdataDog(NewName, GetAllDogsUser(userId)[indexDog].id);
                 DelQueue(indexDog);
                 Console.WriteLine("Успешное переиминование> " + NewName);
             }
-            
+
         }
         #endregion
-        public void Dispose()
+        public void DelDog(string nameDB, int idDog)
         {
-            DB.CloseConnection();
-        }
-        public static DogDAO GetInstens()
-        {
-            if (Instens == null)
+            MySqlCommand command = new MySqlCommand($"DELETE FROM `{nameDB}` WHERE `id`={idDog}", DB.GetConnection());
+            if(command.ExecuteNonQuery()==1)
             {
-                Instens = new DogDAO();
+                Console.WriteLine($"Удалена собака id:{idDog} из баззи данних {nameDB}");
             }
-            return Instens;
         }
-        #endregion
+        public void AddDog(string nameDB,Dog dog)
+        {
+            MySqlCommand Command = new MySqlCommand($"INSERT INTO `{nameDB}`(`id`, `age`, `name`, `typedog`, `satiety`, `hp`, `lvl`, `Endurance`, `Agility`, `Intelligence`, `userid`, `multiplier`, `regDoguser`)" +
+                        $" VALUES (@id,@age,@name,@typedog,@satiety,@hp,@lvl,@Endurance,@Agility,@Intelligence,@userid,@multiplier,@DataUpdate)", DB.GetConnection());
+
+            Command.Parameters.Add("@id", MySqlDbType.Int32).Value = dog.id;
+            Command.Parameters.Add("@age", MySqlDbType.Int32).Value = dog.age;
+            Command.Parameters.Add("@name", MySqlDbType.VarChar).Value = dog.name;
+            Command.Parameters.Add("@typedog", MySqlDbType.VarChar).Value = dog.TypeDogString;
+            Command.Parameters.Add("@satiety", MySqlDbType.Int32).Value = dog.satiety;
+            Command.Parameters.Add("@hp", MySqlDbType.Int32).Value = dog.HP;
+            Command.Parameters.Add("@Endurance", MySqlDbType.Int32).Value = dog.Endurance;
+            Command.Parameters.Add("@Agility", MySqlDbType.Int32).Value = dog.Agility;
+            Command.Parameters.Add("@Intelligence", MySqlDbType.Int32).Value = dog.Intelligence;
+            Command.Parameters.Add("@userid", MySqlDbType.Int32).Value = dog.UserId;
+            Command.Parameters.Add("@lvl", MySqlDbType.Int32).Value = dog.lvl;
+            Command.Parameters.Add("@multiplier", MySqlDbType.Double).Value = dog.multiplier;
+            Command.Parameters.Add("@DataUpdate", MySqlDbType.Date).Value = DateTime.Now;
+
+            if (Command.ExecuteNonQuery() == 1)
+            {
+                Console.WriteLine($"Успешное добавление в Базу данных:{nameDB}");
+            }
+        }
         public string CreatDogRandom(User user)
          {
             
@@ -166,7 +198,64 @@ namespace TelegramDOGs
             return "Ошибочка";
 
         }
-        public List<Dog> GetAllDogsUsers(int userId)
+        public List<Dog> DogsShop()
+        {
+            Random R = new Random();
+            List<Dog> DogsShopListLocal = new List<Dog>();
+            MySqlDataAdapter adapter = new MySqlDataAdapter();
+            DataTable table = new DataTable();
+            MySqlCommand command = new MySqlCommand($"SELECT * FROM `tdogsauction2`", DB.GetConnection());
+            adapter.SelectCommand = command;
+            adapter.Fill(table);
+            if(table.Rows.Count>=1)
+            {
+                Console.WriteLine("Собак достаточно для продажи");
+                foreach (DataRow item in table.Rows)
+                {
+                    DogsShopListLocal.Add(IncealizatorDog(item.ItemArray));
+                }
+            }
+            else
+            {
+                for (int i = 0; i < 10-table.Rows.Count; i++)
+                {
+                    Dog dog = new Dog(R.Next(0, 999999),Convert.ToString((NameDogShop)R.Next(0,21)),0,R.Next(0,100),(TypeDogs)R.Next(0,6),R.Next(50,100));
+                    MySqlCommand Command = new MySqlCommand($"INSERT INTO `tdogsauction2`(`id`, `age`, `name`, `typedog`, `satiety`, `hp`, `lvl`, `Endurance`, `Agility`, `Intelligence`, `userid`, `multiplier`, `regDoguser`)" +
+                        $" VALUES (@id,@age,@name,@typedog,@satiety,@hp,@lvl,@Endurance,@Agility,@Intelligence,@userid,@multiplier,@DataUpdate)", DB.GetConnection());
+                    
+                    Command.Parameters.Add("@id", MySqlDbType.Int32).Value = dog.id;
+                    Command.Parameters.Add("@age", MySqlDbType.Int32).Value = dog.age;
+                    Command.Parameters.Add("@name", MySqlDbType.VarChar).Value = dog.name;
+                    Command.Parameters.Add("@typedog", MySqlDbType.VarChar).Value = dog.TypeDogString;
+                    Command.Parameters.Add("@satiety", MySqlDbType.Int32).Value = dog.satiety;
+                    Command.Parameters.Add("@hp", MySqlDbType.Int32).Value = dog.HP;
+                    Command.Parameters.Add("@Endurance", MySqlDbType.Int32).Value = dog.Endurance;
+                    Command.Parameters.Add("@Agility", MySqlDbType.Int32).Value = dog.Agility;
+                    Command.Parameters.Add("@Intelligence", MySqlDbType.Int32).Value = dog.Intelligence;
+                    Command.Parameters.Add("@userid", MySqlDbType.Int32).Value = dog.UserId;
+                    Command.Parameters.Add("@lvl", MySqlDbType.Int32).Value = dog.lvl;
+                    Command.Parameters.Add("@multiplier", MySqlDbType.Double).Value = dog.multiplier;
+                    Command.Parameters.Add("@DataUpdate", MySqlDbType.Date).Value = DateTime.Now;
+
+                    if (Command.ExecuteNonQuery() == 1)
+                    {
+                        Console.WriteLine("Успешное добавление в магазин собаки");
+                    }
+                    Console.WriteLine("Собак достаточно для продажи");
+                    MySqlCommand Sommand = new MySqlCommand($"SELECT * FROM `tdogsauction2`", DB.GetConnection());
+                    adapter.SelectCommand = Sommand;
+                    adapter.Fill(table);
+                    foreach (DataRow item in table.Rows)
+                    {
+                        DogsShopListLocal.Add(IncealizatorDog(item.ItemArray));
+                    }
+                }
+
+                
+            }            
+            return DogsShopListLocal;
+        }
+        public List<Dog> GetAllDogsUser(int userId)
         {
             MySqlDataAdapter adapter = new MySqlDataAdapter();
             DataTable table = new DataTable();
@@ -223,6 +312,7 @@ namespace TelegramDOGs
             dog.UserId = (int)obj[10];
             dog.multiplier = (double)obj[11];
             dog.RegDogUser = (DateTime)obj[12];
+            dog.Prace = dog.lvl * 200;
             return dog;
         }
     }

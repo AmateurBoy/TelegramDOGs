@@ -26,26 +26,38 @@ namespace TelegramDOGs
         public int Endurance { get;  set; }
         public int Agility { get;  set; }
         public int Intelligence { get;  set; }
-        
-        public Dog(int id, string name, int age, int lvl , int satiety)
+        public int Prace { get; set; }
+
+        public Dog(int id, string name, int age, int lvl, TypeDogs type , int satiety )
         {
             this.id = id;
             this.name = name;
             this.age = age;
             this.lvl = lvl;
             this.satiety = satiety;
-            this.Intelligence = 50;
+            this.TypeDogString = Convert.ToString(type);
+            Updatedog();
+            this.Prace = lvl * 200;
+
+
+        }
+        public Dog(int id, string name, int age, int lvl , int satiety)
+        {
+            this.id = id;
+            this.name = name;
+            this.age = age;
+            this.lvl = lvl;
+            this.satiety = satiety;            
             SetTypeDogRandom();
             Updatedog();
-            
-            
+            this.Prace = lvl * 200;
+
         }
         public Dog()
-        {
-            this.Intelligence = 50;
+        {            
             SetTypeDogRandom();
             Updatedog();
-            
+            this.Prace = lvl * 200;
         }
         public string DogInfo()
         {
@@ -58,6 +70,7 @@ namespace TelegramDOGs
             info += $"Здоровье:{HP}\n";
             info += $"Уровень:{lvl}\n";
             info += $"Сила/Ловкость/Интелект:{Endurance}/{Agility}/{Intelligence}\n";
+            info += $"Предворительная цена: {Prace}";
             return info;
 
         }

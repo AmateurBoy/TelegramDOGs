@@ -21,26 +21,23 @@ namespace TelegramDOGs
         static string GameRulesText = "";
         
         public static ProccesServec proccesAPI = ProccesServec.GetProccesAPI();
-        
         public static UserDAO userDAO = UserDAO.GetInstens();
         public static DogDAO dogDAO = DogDAO.GetInstens();
-        
         public static DataBase DB = new DataBase();
 
         public static bool ButtonActiv = false;
         static ITelegramBotClient bot = new TelegramBotClient("5384438845:AAG6qrDzwcni1Lk8bBIkXAPCJ2-D7YVG6j0");
-
         public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
             var message = update.Message;
             // Некоторые действия
-            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(update));
+            //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(update));
             /*
             if (AdminClass.ActivChat == false)
             {
                 Console.WriteLine($"Id:{update.Message.Chat.Id} Name:{update.Message.Chat.FirstName} " +
                  $"\nText:{update.Message.Text}");
-                userDAO.UpdateUser(userDAO.GetUserByID((int)message.Chat.Id));
+                
             }
             else
             {
@@ -52,7 +49,7 @@ namespace TelegramDOGs
                 }
                 
             }
-               */
+            */   
             
             if(message != null)
             {
@@ -93,11 +90,13 @@ namespace TelegramDOGs
                                 await botClient.SendTextMessageAsync(message.Chat, $"Магазин => Главное меню", replyMarkup: GetButton());
                                 break;
                             case "Купить еды":
+                                await botClient.SendTextMessageAsync(message.Chat, $"Цена 50 еды за 1000 монет", replyMarkup: BotControlButtons.GetBuyEat());
                                 break;
-                            case "Купить енергию":
-                                await botClient.SendTextMessageAsync(message.Chat, $"Купить енергию", replyMarkup: BotControlButtons.GetBuy());
+                            case "Купить єнергию":
+                                await botClient.SendTextMessageAsync(message.Chat, $"Цена 10 єнергии за 1000 монет", replyMarkup: BotControlButtons.GetBuyEnergy());
                                 break;
                             case "Купить собаку":
+                                await botClient.SendTextMessageAsync(message.Chat, $"Список собак для покупки(У всех возраст=0):(Переименовать и прокачать можно в Моем Профеле)", replyMarkup: BotControlButtons.GetBuyDogs(dogDAO.DogsShop()));
                                 break;
                             case "Найти собаку":
                                 await botClient.SendTextMessageAsync(message.Chat, $"{dogDAO.CreatDogRandom(userDAO.GetUserByID((int)message.Chat.Id))}", replyMarkup: GetButton());
@@ -109,7 +108,7 @@ namespace TelegramDOGs
                                 await botClient.SendTextMessageAsync(message.Chat, $"{userDAO.Statistic()}", replyMarkup: GetButton());
                                 break;
                             case "Магазин":
-                                await botClient.SendTextMessageAsync(message.Chat, $"В Разработке", replyMarkup: BotControlButtons.GetButtonShop());
+                                await botClient.SendTextMessageAsync(message.Chat, $"Ваши деньги:{Math.Round(userDAO.GetUserByID((int)message.Chat.Id).money)}", replyMarkup: BotControlButtons.GetButtonShop());
                                 break;
                            
                             default:
@@ -140,13 +139,47 @@ namespace TelegramDOGs
             if (update.Type == Telegram.Bot.Types.Enums.UpdateType.CallbackQuery)
             {
                 int idDog = 0;
+                userDAO.UpdateUser(userDAO.GetUserByID((int)update.CallbackQuery.From.Id));
+                var user = userDAO.GetUserByID((int)update.CallbackQuery.From.Id);
+
                 //оброботка CallbackQuery
-                
+                switch (update.CallbackQuery.Data)
+                {   
+                    case"Buy energy in the store":
+                        
+                        if(user.money>=1000)
+                        {
+                            user.money -= 1000;
+                            user.EnergyUser += 10;
+                            userDAO.UpdateUser(user);
+                            await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"Успешная покупка\nОстаток:💰 {Math.Round(user.money)}\nЄнергии:⚡ {user.EnergyUser}");
+                        }
+                        else
+                        {
+                            await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"Недостаточно денег");
+                        }
+                        break;
+                    case "Buy eat in the store":
+                        
+                        if (user.money >= 1000)
+                        {
+                            user.money -= 1000;
+                            user.eat += 50;
+                            userDAO.UpdateUser(user);
+                            await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"Успешная покупка\nОстаток:💰 {Math.Round(user.money)}\n🍎 Ваш запас еды: {user.eat}");
+                        }
+                        else
+                        {
+                            await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"Недостаточно денег");
+                        }
+                        break;
+                }
+
                 for (int i = 0; i < 10; i++)
                 {
                     if(update.CallbackQuery.Data == Convert.ToString(i))
                     {
-                        idDog = dogDAO.GetAllDogsUsers((int)update.CallbackQuery.From.Id)[i].id;
+                        idDog = dogDAO.GetAllDogsUser((int)update.CallbackQuery.From.Id)[i].id;
                         await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, dogDAO.GetDog(idDog).DogInfo(), replyMarkup: BotControlButtons.SelectDogStatus($"{i}R"));
                         break;
                     }
@@ -161,9 +194,33 @@ namespace TelegramDOGs
                         break;
                     }
                 }
+                for (int i = 0; i < 10; i++)
+                {
+                    List<Dog> dogs = dogDAO.DogsShop();
+                    if (update.CallbackQuery.Data == $"{i}B")
+                    {
+                        if(user.countDog<10)
+                        {
+                                if(user.money >= dogs[i].lvl * 200)
+                                {
+                                    user.money -= dogs[i].lvl * 200;
+                                    dogs[i].UserId = user.Id;
+                                    dogDAO.AddDog("dogs", dogs[i]);
+                                    dogDAO.DelDog("tdogsauction2", dogs[i].id);
+                                    await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"Покупка успешна,Теперь у вас есть новый друг {dogs[i].name}");
+
+                                }
+                                
+                        }
+                        else
+                        {
+                            await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, "У вас максимум собак");
+                        }
+                        break;
+                    }
+                }
             }
         }
-
         private static IReplyMarkup GetButton()
         {
             List<List<KeyboardButton>> KeyboardButtonTest = new List<List<KeyboardButton>>();
@@ -172,8 +229,7 @@ namespace TelegramDOGs
             var keybord = new ReplyKeyboardMarkup(KeyboardButtonTest);
             keybord.ResizeKeyboard = true;
             return keybord;
-        }
-        
+        }        
         public static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
         {  
             Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(exception));
