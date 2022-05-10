@@ -54,6 +54,9 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
         User user = new User();
         user.Id = id;
         user.Name = name;
+        user.money = 10000;
+        user.EnergyUser = 100;
+        user.eat = 100;
         return user;
     }
     public string CreateNewUser(User user)
@@ -119,12 +122,13 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
                 }
 
 
-                MySqlCommand command = new MySqlCommand($"UPDATE `users` SET `money`=@money,`countDogs`=@countDogs,`DateUpdate`=@DataUpdate,`EnergeUser`=@Energy WHERE `id`=@id", DB.GetConnection());
+                MySqlCommand command = new MySqlCommand($"UPDATE `users` SET `money`=@money,`countDogs`=@countDogs,`DateUpdate`=@DataUpdate,`EnergeUser`=@Energy, `eat`=@Eat WHERE `id`=@id", DB.GetConnection());
                 command.Parameters.Add("@DataUpdate", MySqlDbType.DateTime).Value = DateTime.Now;
                 command.Parameters.Add("@money", MySqlDbType.Double).Value = user.money;
                 command.Parameters.Add("@countDogs", MySqlDbType.Int32).Value = user.Dogs.Count;
                 command.Parameters.Add("@id", MySqlDbType.Int32).Value = user.Id;
                 command.Parameters.Add("@Energy", MySqlDbType.Int32).Value = user.EnergyUser;
+                command.Parameters.Add("@Eat", MySqlDbType.Int32).Value = user.eat;
 
 
                 if (command.ExecuteNonQuery() == 1)
@@ -233,6 +237,10 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
         return Users;
             
     }
+    public void DelAllUserMessage(List<User> users)
+    {
+        
+    }
     public User InitializationUser(object[] data)
     {
             User user = new User();
@@ -245,7 +253,7 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
             user.eat = (int)item[5];
             user.rating = (int)item[6];
             user.DataUpdate = (DateTime)item[7];
-            user.Dogs = dogs.GetAllDogsUsers(user.Id);
+            user.Dogs = dogs.GetAllDogsUser(user.Id);
         return user;
     }
 

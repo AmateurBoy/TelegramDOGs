@@ -29,16 +29,53 @@ namespace TelegramDOGs
         public static IReplyMarkup GetButtonShop()
         {
             List<List<KeyboardButton>> KeyboardButtonTest = new List<List<KeyboardButton>>();
-            KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("Купить еды"), new KeyboardButton("Купить енергию")});
+            KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("Купить еды"), new KeyboardButton("Купить єнергию")});
             KeyboardButtonTest.Add(new List<KeyboardButton> { new KeyboardButton("Купить собаку"), new KeyboardButton("Главное меню") });
             var keybord = new ReplyKeyboardMarkup(KeyboardButtonTest);
             keybord.ResizeKeyboard = true;
             return keybord;
         }        
-        public static IReplyMarkup GetBuy()
+        public static IReplyMarkup GetBuyEnergy()
         {
-            return new InlineKeyboardMarkup(new InlineKeyboardButton("Для покупки") { Text = "Купить",CallbackData= "Buy energy in the store" }) ;
+            return new InlineKeyboardMarkup(new InlineKeyboardButton("Для покупки") { Text = "Купить", CallbackData= "Buy energy in the store" }) ;
         }
+        public static IReplyMarkup GetBuyEat()
+        {
+            return new InlineKeyboardMarkup(new InlineKeyboardButton("Для покупки") { Text = "Купить", CallbackData= "Buy eat in the store" }) ;
+        }
+        public static IReplyMarkup GetBuyDogs(List<Dog> Dogs)
+        {
+           
+             
+            List<List<InlineKeyboardButton>> IKB = new List<List<InlineKeyboardButton>>();
+            int countRows = 0;
+
+            countRows = Dogs.Count / 2;
+            for (int i = 0, j = 0; i < Dogs.Count; i++)
+            {
+
+                if (countRows >= i)
+                {
+                    if (j == Dogs.Count - 1)
+                    {
+                        IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("Имя собаки") { Text = $"name:{Dogs[j].name} ,lvl:{Dogs[j].lvl}, Prace:{Dogs[j].Prace} ,{Dogs[j].TypeDogString}", CallbackData = $"{j}B" } });
+                        break;
+                    }
+                    if (j >= Dogs.Count)
+                    {
+                        break;
+                    }
+                    IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("Имя собаки") { Text = $"name:{Dogs[j].name},lvl:{Dogs[j].lvl}, Prace:{Dogs[j].Prace}, {Dogs[j].TypeDogString}", CallbackData = $"{j}B" }, new InlineKeyboardButton("Имя собаки") { Text = $"name:{Dogs[j+1].name},lvl:{Dogs[j+1].lvl}, Prace:{Dogs[j+1].Prace}, {Dogs[j+1].TypeDogString}", CallbackData = $"{j + 1}B" } });
+                    j += 2;
+                }
+
+
+            }
+            var keybord = new InlineKeyboardMarkup(IKB);
+            
+            return keybord;
+        }
+
         public static IReplyMarkup GetDogButton(List<Dog>Dogs)
         {
             List<List<InlineKeyboardButton>> IKB = new List<List<InlineKeyboardButton>>();
