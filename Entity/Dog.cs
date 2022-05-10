@@ -12,7 +12,7 @@ namespace TelegramDOGs
     {
         
         Random R = new Random();
-        public int UserId { get;  set; }
+        public long UserId { get;  set; }
         public int id { get;  set; }
         public string name { get;  set; }
         public int age { get;  set; }
@@ -59,6 +59,16 @@ namespace TelegramDOGs
             Updatedog();
             this.Prace = lvl * 200;
         }
+        public string Doglvl()
+        {
+            string res = "";
+            res += $"Имя:{name}";
+            res += $"Уровень:{lvl}";
+            res += $"Сила:{Endurance}";
+            res += $"Ловкость:{Agility}";
+            res += $"Интелект:{Intelligence}";
+            return res;
+        }
         public string DogInfo()
         {
             string info = "";
@@ -86,11 +96,11 @@ namespace TelegramDOGs
         {
             return lvl - (Endurance + Agility + Intelligence);
         }
-        public void LvlUp()
+        public void LvlUp(int count)
         {
-            if(lvl<=50)
+            if(lvl<=1000)
             {
-                this.lvl += 1;
+                this.lvl += count;
             }           
             else
             {
@@ -120,6 +130,7 @@ namespace TelegramDOGs
             if (Endurance + Agility + Intelligence < lvl)
             {
                 Intelligence += 1;
+                Updatedog();
             }
         }
         public void Updatedog()

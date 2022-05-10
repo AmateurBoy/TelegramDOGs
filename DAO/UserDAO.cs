@@ -49,7 +49,7 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
     #endregion
     private DataBase DB;
 
-    public User CreateNewUser(int id, string name)
+    public User CreateNewUser(long id, string name)
     {
         User user = new User();
         user.Id = id;
@@ -65,7 +65,7 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
         if (IsAcaunt(Convert.ToInt64(user.Id))==false)
         {
             MySqlCommand Command = new MySqlCommand($"INSERT INTO `users` (`id`, `name`, `countDogs`, `money`, `EnergeUser`, `eat`, `rating`, `DateUpdate`) VALUES (@ID, @UserName,@countDogs,@money,@EnergeUser,@Eat,@rating,@DataUpdate)", DB.GetConnection());
-            Command.Parameters.Add("@ID", MySqlDbType.Int32).Value = user.Id;
+            Command.Parameters.Add("@ID", MySqlDbType.Int64).Value = user.Id;
             Command.Parameters.Add("@UserName", MySqlDbType.VarChar).Value = user.Name;
             Command.Parameters.Add("@countDogs", MySqlDbType.Int32).Value = user.countDog;
             Command.Parameters.Add("@money", MySqlDbType.Int32).Value = user.money;
@@ -104,6 +104,7 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
                 {
                     foreach (Dog item in user.Dogs)
                     {
+                        item.multiplier += item.Intelligence * 0.001;
                         multsuma += item.multiplier;
                     }
 
@@ -182,7 +183,7 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
             }
             return result;
         }
-    public User GetUserByID(int ID)
+    public User GetUserByID(long ID)
     {
         DataTable table = new DataTable();
         MySqlDataAdapter adapter = new MySqlDataAdapter(); 
@@ -245,7 +246,7 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
     {
             User user = new User();
             var item = data;
-            user.Id = Convert.ToInt32(item[0]);
+            user.Id = (long)item[0];
             user.Name = (string)item[1];
             user.countDog = (int)item[2];
             user.money = (double)item[3];

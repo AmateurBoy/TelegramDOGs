@@ -75,7 +75,7 @@ namespace TelegramDOGs
             
             return keybord;
         }
-
+       
         public static IReplyMarkup GetDogButton(List<Dog>Dogs)
         {
             List<List<InlineKeyboardButton>> IKB = new List<List<InlineKeyboardButton>>();
@@ -108,9 +108,21 @@ namespace TelegramDOGs
         }
         public static IReplyMarkup SelectDogStatus(string selectIndexDog)
         {
+            string index = selectIndexDog.Remove(1) ;
             List<List<InlineKeyboardButton>> IKB = new List<List<InlineKeyboardButton>>();
-            IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("ава") { Text = $"Переименовать Собаку", CallbackData = $"{selectIndexDog}" }, new InlineKeyboardButton("Характеристика") { Text = $"Характеристики собаки", CallbackData = $"21312" } });
-            IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("віаів") { Text = $"Покормить собаку", CallbackData = $"3123" }, new InlineKeyboardButton("Продать") { Text = $"Продать(в разработке)", CallbackData = $"13123" } });
+            IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("ава") { Text = $"Переименовать Собаку", CallbackData = $"{selectIndexDog}" }, new InlineKeyboardButton("Усыпить :(") { Text = $"Усыпить :(", CallbackData = $"Ded_dog{index}" } });
+            IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("віаів") { Text = $"Покормить собаку", CallbackData = $"Eat{index}" }, new InlineKeyboardButton("Продать") { Text = $"Продать(в разработке)", CallbackData = $"13123" } });
+            IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("віаів") { Text = $"Воспитывать", CallbackData = $"Training{index}" } });
+            var keybord = new InlineKeyboardMarkup(IKB);
+            return keybord;
+        }
+        public static IReplyMarkup TrainingDog(int index)
+        {
+           
+            List<List<InlineKeyboardButton>> IKB = new List<List<InlineKeyboardButton>>();
+            IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("ава") { Text = $"Улучшить Силу", CallbackData = $"{index}S" }, new InlineKeyboardButton("Усыпить :(") { Text = $"Улучшить Ловкость", CallbackData = $"{index}L" } });
+            IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("віаів") { Text = $"Улучшить Интелект", CallbackData = $"{index}I" } });
+            
             var keybord = new InlineKeyboardMarkup(IKB);
             return keybord;
         }

@@ -94,7 +94,7 @@ namespace TelegramDOGs
             if (indexDog >= 0)
             {
                 GetAllDogsUser(userId)[indexDog].name = NewName;
-                UpdataDog(NewName, GetAllDogsUser(userId)[indexDog].id);
+                UpdataDogName(NewName, GetAllDogsUser(userId)[indexDog].id);
                 DelQueue(indexDog);
                 Console.WriteLine("Успешное переиминование> " + NewName);
                 return true;
@@ -124,7 +124,7 @@ namespace TelegramDOGs
             Command.Parameters.Add("@Endurance", MySqlDbType.Int32).Value = dog.Endurance;
             Command.Parameters.Add("@Agility", MySqlDbType.Int32).Value = dog.Agility;
             Command.Parameters.Add("@Intelligence", MySqlDbType.Int32).Value = dog.Intelligence;
-            Command.Parameters.Add("@userid", MySqlDbType.Int32).Value = dog.UserId;
+            Command.Parameters.Add("@userid", MySqlDbType.Int64).Value = dog.UserId;
             Command.Parameters.Add("@lvl", MySqlDbType.Int32).Value = dog.lvl;
             Command.Parameters.Add("@multiplier", MySqlDbType.Double).Value = dog.multiplier;
             Command.Parameters.Add("@DataUpdate", MySqlDbType.Date).Value = DateTime.Now;
@@ -233,7 +233,7 @@ namespace TelegramDOGs
                     Command.Parameters.Add("@Endurance", MySqlDbType.Int32).Value = dog.Endurance;
                     Command.Parameters.Add("@Agility", MySqlDbType.Int32).Value = dog.Agility;
                     Command.Parameters.Add("@Intelligence", MySqlDbType.Int32).Value = dog.Intelligence;
-                    Command.Parameters.Add("@userid", MySqlDbType.Int32).Value = dog.UserId;
+                    Command.Parameters.Add("@userid", MySqlDbType.Int64).Value = dog.UserId;
                     Command.Parameters.Add("@lvl", MySqlDbType.Int32).Value = dog.lvl;
                     Command.Parameters.Add("@multiplier", MySqlDbType.Double).Value = dog.multiplier;
                     Command.Parameters.Add("@DataUpdate", MySqlDbType.Date).Value = DateTime.Now;
@@ -257,7 +257,7 @@ namespace TelegramDOGs
             }            
             return DogsShopListLocal;
         }
-        public List<Dog> GetAllDogsUser(int userId)
+        public List<Dog> GetAllDogsUser(long userId)
         {
             MySqlDataAdapter adapter = new MySqlDataAdapter();
             DataTable table = new DataTable();
@@ -285,7 +285,7 @@ namespace TelegramDOGs
             }
             return dog;
         }
-        public async void UpdataDog(string name,int dogId)
+        public async void UpdataDogName(string name,int dogId)
         {
             
             
@@ -296,6 +296,16 @@ namespace TelegramDOGs
             {
                 if (AdminClass.ActivChat == false)
                     Console.WriteLine("Имя обновлено");
+            }
+        }
+        public async void UpdataDog(Dog dog)
+        {
+            MySqlCommand command = new MySqlCommand($"UPDATE `dogs` SET `age`={dog.age},`satiety`={dog.satiety},`hp`={dog.HP},`lvl`={dog.lvl},`Endurance`={dog.Endurance},`Agility`={dog.Agility},`Intelligence`={dog.Intelligence},`userid`={dog.UserId} WHERE `id`={dog.id}", DB.GetConnection());
+            
+            if (command.ExecuteNonQuery() == 1)
+            {
+                if (AdminClass.ActivChat == false)
+                    Console.WriteLine("Собака обновлена");
             }
         }
         public Dog IncealizatorDog(object[] obj)
@@ -311,7 +321,7 @@ namespace TelegramDOGs
             dog.Endurance = (int)obj[7];
             dog.Agility = (int)obj[8];
             dog.Intelligence = (int)obj[9];
-            dog.UserId = (int)obj[10];
+            dog.UserId = (long)obj[10];
             dog.multiplier = (double)obj[11];
             dog.RegDogUser = (DateTime)obj[12];
             dog.Prace = dog.lvl * 200;
