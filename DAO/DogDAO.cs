@@ -88,7 +88,7 @@ namespace TelegramDOGs
             }
 
         }
-        public void EditNameDogs(string NewName, int userId)
+        public bool EditNameDogs(string NewName, int userId)
         {
             int indexDog = idDog(userId);
             if (indexDog >= 0)
@@ -97,8 +97,9 @@ namespace TelegramDOGs
                 UpdataDog(NewName, GetAllDogsUser(userId)[indexDog].id);
                 DelQueue(indexDog);
                 Console.WriteLine("Успешное переиминование> " + NewName);
+                return true;
             }
-
+            return false;
         }
         #endregion
         public void DelDog(string nameDB, int idDog)
@@ -241,17 +242,18 @@ namespace TelegramDOGs
                     {
                         Console.WriteLine("Успешное добавление в магазин собаки");
                     }
-                    Console.WriteLine("Собак достаточно для продажи");
-                    MySqlCommand Sommand = new MySqlCommand($"SELECT * FROM `tdogsauction2`", DB.GetConnection());
-                    adapter.SelectCommand = Sommand;
-                    adapter.Fill(table);
-                    foreach (DataRow item in table.Rows)
-                    {
-                        DogsShopListLocal.Add(IncealizatorDog(item.ItemArray));
-                    }
+                    
+                }
+                
+                MySqlCommand Sommand = new MySqlCommand($"SELECT * FROM `tdogsauction2`", DB.GetConnection());
+                adapter.SelectCommand = Sommand;
+                adapter.Fill(table);
+                foreach (DataRow item in table.Rows)
+                {
+                    DogsShopListLocal.Add(IncealizatorDog(item.ItemArray));
                 }
 
-                
+
             }            
             return DogsShopListLocal;
         }

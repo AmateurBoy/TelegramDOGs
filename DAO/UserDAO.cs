@@ -54,6 +54,9 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
         User user = new User();
         user.Id = id;
         user.Name = name;
+        user.money = 10000;
+        user.EnergyUser = 100;
+        user.eat = 100;
         return user;
     }
     public string CreateNewUser(User user)
@@ -233,6 +236,10 @@ class UserDAO  //DAO - Data Access Object -> Объект Доступа к Да
         }
         return Users;
             
+    }
+    public void DelAllUserMessage(List<User> users)
+    {
+        
     }
     public User InitializationUser(object[] data)
     {
