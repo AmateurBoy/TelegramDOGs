@@ -75,7 +75,6 @@ namespace TelegramDOGs
             
             return keybord;
         }
-       
         public static IReplyMarkup GetDogButton(List<Dog>Dogs)
         {
             List<List<InlineKeyboardButton>> IKB = new List<List<InlineKeyboardButton>>();

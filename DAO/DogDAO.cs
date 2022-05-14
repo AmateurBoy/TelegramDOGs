@@ -116,7 +116,7 @@ namespace TelegramDOGs
                         $" VALUES (@id,@age,@name,@typedog,@satiety,@hp,@lvl,@Endurance,@Agility,@Intelligence,@userid,@multiplier,@DataUpdate)", DB.GetConnection());
 
             Command.Parameters.Add("@id", MySqlDbType.Int32).Value = dog.id;
-            Command.Parameters.Add("@age", MySqlDbType.Int32).Value = dog.age;
+            Command.Parameters.Add("@age", MySqlDbType.Float).Value = dog.age;
             Command.Parameters.Add("@name", MySqlDbType.VarChar).Value = dog.name;
             Command.Parameters.Add("@typedog", MySqlDbType.VarChar).Value = dog.TypeDogString;
             Command.Parameters.Add("@satiety", MySqlDbType.Int32).Value = dog.satiety;
@@ -127,7 +127,7 @@ namespace TelegramDOGs
             Command.Parameters.Add("@userid", MySqlDbType.Int64).Value = dog.UserId;
             Command.Parameters.Add("@lvl", MySqlDbType.Int32).Value = dog.lvl;
             Command.Parameters.Add("@multiplier", MySqlDbType.Double).Value = dog.multiplier;
-            Command.Parameters.Add("@DataUpdate", MySqlDbType.Date).Value = DateTime.Now;
+            Command.Parameters.Add("@DataUpdate", MySqlDbType.DateTime).Value = DateTime.Now;
 
             if (Command.ExecuteNonQuery() == 1)
             {
@@ -172,10 +172,10 @@ namespace TelegramDOGs
                             if (R.Next(0, 100) < 20)
                             {
                                 MySqlDataAdapter adapter = new MySqlDataAdapter();
-                                Dog dog = new Dog(R.Next(0, 999999), "ДворнягаСимпатяга", (byte)R.Next(0, 85), (byte)R.Next(0, 10), R.Next(3, 25));
+                                Dog dog = new Dog(R.Next(0, 999999), "ДворнягаСимпатяга", (byte)R.Next(0, 85), (byte)R.Next(0, 20), R.Next(3, 25));
 
                                 MySqlCommand command = new MySqlCommand($"INSERT INTO `dogs`(`id`,`age`, `name`, `typedog`, `satiety`, `hp`, `lvl`, `Endurance`, `Agility`, `Intelligence`, `userid`, `multiplier`,`regDoguser`) VALUES ('{dog.id}','{dog.age}','{dog.name}','{dog.TypeDogString}','{dog.satiety}','{dog.HP}','{dog.lvl}','{dog.Endurance}','{dog.Agility}','{dog.Intelligence}','{user.Id}',@multiplier,@DataUpdate)", DB.GetConnection());
-                                command.Parameters.Add("@DataUpdate", MySqlDbType.Date).Value = DateTime.Now;
+                                command.Parameters.Add("@DataUpdate", MySqlDbType.DateTime).Value = DateTime.Now;
                                 command.Parameters.Add("@multiplier", MySqlDbType.Double).Value = dog.multiplier;
                                 adapter.SelectCommand = command;
                                 if (command.ExecuteNonQuery() == 1)
@@ -285,6 +285,32 @@ namespace TelegramDOGs
             }
             return dog;
         }
+        public async void UpdataDog(Dog dog)
+        {
+            if(dog.isDead()==false)
+            {
+                Console.WriteLine(dog.TimeLifeDoginfo(dog.age));
+                MySqlCommand command = new MySqlCommand($"UPDATE `dogs` SET `age`=@age, `satiety`=@satiety, `hp`={dog.HP}, `lvl`={dog.lvl}, `Endurance`={dog.Endurance}, `Agility`={dog.Agility}, `Intelligence`={dog.Intelligence}, `userid`={dog.UserId},`regDoguser`=@DataUpdate WHERE `id`={dog.id}", DB.GetConnection());
+                command.Parameters.Add("@DataUpdate", MySqlDbType.DateTime).Value = DateTime.Now;
+                command.Parameters.Add("@age", MySqlDbType.Float).Value = dog.age;
+                command.Parameters.Add("@satiety", MySqlDbType.Double).Value = dog.satiety;
+                if (command.ExecuteNonQuery() == 1)
+                {
+                    if (AdminClass.ActivChat == false)
+                        Console.WriteLine("Собака обновлена");
+                }
+            }
+            else
+            {
+                MySqlCommand command = new MySqlCommand($"DELETE FROM `dogs` WHERE `id`={dog.id}", DB.GetConnection());
+                if (command.ExecuteNonQuery() == 1)
+                {
+                    if (AdminClass.ActivChat == false)
+                        Console.WriteLine("Собака умерла и удалина из базы данных");
+                }
+            }
+
+        }
         public async void UpdataDogName(string name,int dogId)
         {
             
@@ -298,21 +324,12 @@ namespace TelegramDOGs
                     Console.WriteLine("Имя обновлено");
             }
         }
-        public async void UpdataDog(Dog dog)
-        {
-            MySqlCommand command = new MySqlCommand($"UPDATE `dogs` SET `age`={dog.age},`satiety`={dog.satiety},`hp`={dog.HP},`lvl`={dog.lvl},`Endurance`={dog.Endurance},`Agility`={dog.Agility},`Intelligence`={dog.Intelligence},`userid`={dog.UserId} WHERE `id`={dog.id}", DB.GetConnection());
-            
-            if (command.ExecuteNonQuery() == 1)
-            {
-                if (AdminClass.ActivChat == false)
-                    Console.WriteLine("Собака обновлена");
-            }
-        }
+        
         public Dog IncealizatorDog(object[] obj)
         {
             Dog dog = new Dog();
             dog.id = (int)obj[0];
-            dog.age = (int)obj[1];
+            dog.age = (float)obj[1];
             dog.name = (string)obj[2];
             dog.TypeDogString = (string)obj[3];
             dog.satiety = (int)obj[4];

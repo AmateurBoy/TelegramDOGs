@@ -25,6 +25,7 @@ namespace TelegramDOGs
         static ITelegramBotClient bot = new TelegramBotClient("5384438845:AAG6qrDzwcni1Lk8bBIkXAPCJ2-D7YVG6j0");
         public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
+           // 
             var message = update.Message;
             switch (update.Type)
             {
@@ -134,7 +135,7 @@ namespace TelegramDOGs
                         userDAO.UpdateUser(userDAO.GetUserByID((int)update.CallbackQuery.From.Id));
                         var user = userDAO.GetUserByID((int)update.CallbackQuery.From.Id);
                         List<Dog> dogs = dogDAO.DogsShop();
-                       
+
                         //оброботка CallbackQuery
                         switch (update.CallbackQuery.Data)
                         {
@@ -173,7 +174,7 @@ namespace TelegramDOGs
                             for (int i = 0; i < 10; i++)
                             {
 
-                                if (dogDAO.GetAllDogsUser(user.Id).Count - 1 > i)
+                                if (user.countDog - 1 >= i)
                                 {
                                     Dog dog = dogDAO.GetAllDogsUser(user.Id)[i];
                                     if (update.CallbackQuery.Data == $"Eat{i}")
@@ -298,6 +299,7 @@ namespace TelegramDOGs
                                     dogDAO.DelDog("dogs", dogDAO.GetAllDogsUser(user.Id)[i].id);
                                     await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"Песик уже не с нами :(");
                                     await botClient.DeleteMessageAsync(update.CallbackQuery.From.Id, update.CallbackQuery.Message.MessageId);
+                                    
                                     break;
                                 }
 
@@ -366,9 +368,11 @@ namespace TelegramDOGs
             }
             */
         }
-        public void ClearServer(ITelegramBotClient bot, Update update)
+
+        public static void ClearServer(ITelegramBotClient bot, Update update)
         {
-            bot.GetUpdatesAsync(update.Id+1);
+            bot.GetUpdatesAsync(update.Id+10);
+            
         }
          
         public static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
@@ -377,6 +381,7 @@ namespace TelegramDOGs
         }
         static void Main(string[] args)
         {
+           
             proccesAPI.StartServer();
             Console.WriteLine("Запущен бот " + bot.GetMeAsync().Result.FirstName);
             
@@ -401,12 +406,7 @@ namespace TelegramDOGs
                 
                 if (key.Key == ConsoleKey.End)
                 {
-                    Console.WriteLine("AdminMessageActiv" +
-                        "" +
-                        "" +
-                        "" +
-                        "=========================================");
-                    AdminClass.AdminChat(bot);
+                    
                 }
                 if(key.Key == ConsoleKey.Home)
                 {
