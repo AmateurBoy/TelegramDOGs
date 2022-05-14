@@ -82,11 +82,11 @@ namespace TelegramDOGs
             info += $"🐶 Имя:{name}\n";
             info += $"🐕🐩🐕‍Порода:{TypeDogString}\n";
             info += $"⏰ Возраст:{TimeLifeDoginfo(age)}\n";
-            info += $"🍽 Сытость:{satiety}\n";
+            info += $"🍽 Сытость:{Math.Round(satiety)}\n";
             info += $"🫀 Здоровье:{HP}\n";
             info += $"📈 Уровень:{lvl}\n";
             info += $"🦾 Сила/Ловкость/Интелект:{Endurance}/{Agility}/{Intelligence}\n";
-            info += $"Пасивный доход с собаки: {multiplier}/sek";
+            info += $"Пасивный доход с собаки: {multiplier}/sek\n";
             info += $"🌝 Предворительная цена: {Prace}";
             return info;
 
@@ -211,25 +211,25 @@ namespace TelegramDOGs
             return info;
 
         }
-        public void UpEndurance()
+        public void UpEndurance(int factor)
         {
             if(Endurance+Agility+Intelligence<lvl)
             {
-                Endurance += 1;
+                Endurance += factor;
             }
         }
-        public void UpAgility()
+        public void UpAgility(int factor)
         {
             if (Endurance + Agility + Intelligence < lvl)
             {
-                Agility += 1;
+                Agility += factor;
             }
         }
-        public void UpIntelligence()
+        public void UpIntelligence(int factor)
         {
             if (Endurance + Agility + Intelligence < lvl)
             {
-                Intelligence += 1;
+                Intelligence += factor;
                 Updatedog();
             }
         }

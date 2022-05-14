@@ -119,7 +119,7 @@ namespace TelegramDOGs
             Command.Parameters.Add("@age", MySqlDbType.Float).Value = dog.age;
             Command.Parameters.Add("@name", MySqlDbType.VarChar).Value = dog.name;
             Command.Parameters.Add("@typedog", MySqlDbType.VarChar).Value = dog.TypeDogString;
-            Command.Parameters.Add("@satiety", MySqlDbType.Int32).Value = dog.satiety;
+            Command.Parameters.Add("@satiety", MySqlDbType.Double).Value = dog.satiety;
             Command.Parameters.Add("@hp", MySqlDbType.Int32).Value = dog.HP;
             Command.Parameters.Add("@Endurance", MySqlDbType.Int32).Value = dog.Endurance;
             Command.Parameters.Add("@Agility", MySqlDbType.Int32).Value = dog.Agility;
@@ -228,7 +228,7 @@ namespace TelegramDOGs
                     Command.Parameters.Add("@age", MySqlDbType.Int32).Value = dog.age;
                     Command.Parameters.Add("@name", MySqlDbType.VarChar).Value = dog.name;
                     Command.Parameters.Add("@typedog", MySqlDbType.VarChar).Value = dog.TypeDogString;
-                    Command.Parameters.Add("@satiety", MySqlDbType.Int32).Value = dog.satiety;
+                    Command.Parameters.Add("@satiety", MySqlDbType.Double).Value = dog.satiety;
                     Command.Parameters.Add("@hp", MySqlDbType.Int32).Value = dog.HP;
                     Command.Parameters.Add("@Endurance", MySqlDbType.Int32).Value = dog.Endurance;
                     Command.Parameters.Add("@Agility", MySqlDbType.Int32).Value = dog.Agility;
@@ -332,7 +332,7 @@ namespace TelegramDOGs
             dog.age = (float)obj[1];
             dog.name = (string)obj[2];
             dog.TypeDogString = (string)obj[3];
-            dog.satiety = (int)obj[4];
+            dog.satiety = (double)obj[4];
             dog.HP = (int)obj[5];
             dog.lvl = (int)obj[6];
             dog.Endurance = (int)obj[7];

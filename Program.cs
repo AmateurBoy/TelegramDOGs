@@ -132,10 +132,12 @@ namespace TelegramDOGs
                     break;
                 case Telegram.Bot.Types.Enums.UpdateType.CallbackQuery:
                     {
-                        userDAO.UpdateUser(userDAO.GetUserByID((int)update.CallbackQuery.From.Id));
                         var user = userDAO.GetUserByID((int)update.CallbackQuery.From.Id);
-                        List<Dog> dogs = dogDAO.DogsShop();
+                        userDAO.UpdateUser(user);
 
+                        List<Dog> dogs = dogDAO.DogsShop();
+                        
+                        
                         //оброботка CallbackQuery
                         switch (update.CallbackQuery.Data)
                         {
@@ -169,14 +171,13 @@ namespace TelegramDOGs
                                 break;
                         }
 
-                        try
-                        {
+                       
                             for (int i = 0; i < 10; i++)
                             {
-
                                 if (user.countDog - 1 >= i)
                                 {
                                     Dog dog = dogDAO.GetAllDogsUser(user.Id)[i];
+                                    
                                     if (update.CallbackQuery.Data == $"Eat{i}")
                                     {
                                         if (user.eat >= 10)
@@ -192,63 +193,61 @@ namespace TelegramDOGs
                                         {
                                             await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"Недостаточно еды хозяин :( \nМинимум 10");
                                         }
-                                        break;
-                                    }
                                     //Прокачка собаки
-                                    if (update.CallbackQuery.Data == $"Training{i}")
-                                    {
-                                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"{dog.Doglvl()}", replyMarkup: BotControlButtons.TrainingDog(i));
+                                    
+                                    break;
                                     }
-                                    if (update.CallbackQuery.Data == $"{i}S")
-                                    {
-
-                                        if (dog.Agility + dog.Endurance + dog.Intelligence < dog.lvl)
-                                        {
-                                            dog.UpAgility();
-                                            await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"+ 1 к силе.");
-                                            dogDAO.UpdataDog(dog);
-                                        }
-                                        else
-                                        {
-                                            await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"Недостаточно свободного уровня.");
-                                        }
-
-
-                                    }//Сила
-                                    if (update.CallbackQuery.Data == $"{i}L")
-                                    {
-                                        if (dog.Agility + dog.Endurance + dog.Intelligence < dog.lvl)
-                                        {
-                                            dog.UpEndurance();
-                                            await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"+ 1 к Ловкости.");
-                                            dogDAO.UpdataDog(dog);
-                                        }
-                                        else
-                                        {
-                                            await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"Недостаточно свободного уровня.");
-                                        }
-
-
-                                    }//Ловкость
-                                    if (update.CallbackQuery.Data == $"{i}I")
-                                    {
-                                        if (dog.Agility + dog.Endurance + dog.Intelligence < dog.lvl)
-                                        {
-                                            dog.UpIntelligence();
-                                            await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"+ 1 к Интелекту.");
-                                            dogDAO.UpdataDog(dog);
-                                        }
-                                        else
-                                        {
-                                            await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"Недостаточно свободного уровня.");
-                                        }
-
-
-
-                                    }//Интелект
+                                if (update.CallbackQuery.Data == $"Training{i}")
+                                {
+                                    await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"{dog.Doglvl()}", replyMarkup: BotControlButtons.TrainingDog(i));
                                 }
+                                if (update.CallbackQuery.Data == $"{i}S")
+                                {
+
+                                    if (dog.Agility + dog.Endurance + dog.Intelligence < dog.lvl)
+                                    {
+                                        dog.UpAgility(5);
+                                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"+ 5 к силе.");
+                                        dogDAO.UpdataDog(dog);
+                                    }
+                                    else
+                                    {
+                                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"Недостаточно свободного уровня.");
+                                    }
 
 
+                                }//Сила
+                                if (update.CallbackQuery.Data == $"{i}L")
+                                {
+                                    if (dog.Agility + dog.Endurance + dog.Intelligence < dog.lvl)
+                                    {
+                                        dog.UpEndurance(5);
+                                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"+ 5 к Ловкости.");
+                                        dogDAO.UpdataDog(dog);
+                                    }
+                                    else
+                                    {
+                                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"Недостаточно свободного уровня.");
+                                    }
+
+
+                                }//Ловкость
+                                if (update.CallbackQuery.Data == $"{i}I")
+                                {
+                                    if (dog.Agility + dog.Endurance + dog.Intelligence < dog.lvl)
+                                    {
+                                        dog.UpIntelligence(5);
+                                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"+ 5 к Интелекту.");
+                                        dogDAO.UpdataDog(dog);
+                                    }
+                                    else
+                                    {
+                                        await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"Недостаточно свободного уровня.");
+                                    }
+
+
+
+                                }//Интелект
                                 if (update.CallbackQuery.Data == Convert.ToString(i))
                                 {
                                     await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, dogDAO.GetDog(dogDAO.GetAllDogsUser((int)update.CallbackQuery.From.Id)[i].id).DogInfo(), replyMarkup: BotControlButtons.SelectDogStatus($"{i}R"));
@@ -299,21 +298,21 @@ namespace TelegramDOGs
                                     dogDAO.DelDog("dogs", dogDAO.GetAllDogsUser(user.Id)[i].id);
                                     await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"Песик уже не с нами :(");
                                     await botClient.DeleteMessageAsync(update.CallbackQuery.From.Id, update.CallbackQuery.Message.MessageId);
-                                    
+
                                     break;
                                 }
 
-
-
-
-
                             }
-                        }
-                        catch
-                        {
-                            await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"Устаревшая кнопка удалаю...");
-                            await botClient.DeleteMessageAsync(update.CallbackQuery.From.Id, update.CallbackQuery.Message.MessageId);
-                        }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                        
+                        
+                            //await botClient.SendTextMessageAsync(update.CallbackQuery.From.Id, $"Устаревшая кнопка удалаю...");
+                            //await botClient.DeleteMessageAsync(update.CallbackQuery.From.Id, update.CallbackQuery.Message.MessageId);
+                        
                         
                         
                         userDAO.UpdateUser(user);

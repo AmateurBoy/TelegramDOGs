@@ -109,22 +109,39 @@ namespace TelegramDOGs
         {
             string index = selectIndexDog.Remove(1) ;
             List<List<InlineKeyboardButton>> IKB = new List<List<InlineKeyboardButton>>();
-            IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("ава") { Text = $"Переименовать Собаку", CallbackData = $"{selectIndexDog}" }, new InlineKeyboardButton("Усыпить :(") { Text = $"Усыпить :(", CallbackData = $"Ded_dog{index}" } });
-            IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("віаів") { Text = $"Покормить собаку", CallbackData = $"Eat{index}" }, new InlineKeyboardButton("Продать") { Text = $"Продать(в разработке)", CallbackData = $"13123" } });
-            IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("віаів") { Text = $"Воспитывать", CallbackData = $"Training{index}" } });
+            IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("ава") { Text = $"Переименовать Собаку", CallbackData = $"{selectIndexDog}" }, new InlineKeyboardButton("Усыпить :(") { Text = $"Усыпить :(", CallbackData = $"Ded_dog{index}" }});
+            IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("віаів") { Text = $"Покормить Собаку", CallbackData = $"Eat{index}" }, new InlineKeyboardButton("Продать") { Text = $"Продать(в разработке)", CallbackData = $"13123" }});
+            IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("віаіваа") { Text = $"Выставка Собак(в разработке)", CallbackData = $"Exhibition{index}" }, new InlineKeyboardButton("Бой") { Text = $"Собачьи бои(в разработке)", CallbackData = $"DogFighting{index}" }});
+            IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("fadsf") { Text = $"Воспитывать", CallbackData = $"Training{index}" } });
             var keybord = new InlineKeyboardMarkup(IKB);
             return keybord;
         }
         public static IReplyMarkup TrainingDog(int index)
         {
-           
+              
             List<List<InlineKeyboardButton>> IKB = new List<List<InlineKeyboardButton>>();
+            //IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("іаів") { Text = $"+", CallbackData = $"{factor+1}" }, new InlineKeyboardButton("hfddf") { Text = $"{factor}", CallbackData = $"{factor}" }, new InlineKeyboardButton("hfddf") { Text = $"-", CallbackData = $"{factor-1}" } });
             IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("ава") { Text = $"Улучшить Силу", CallbackData = $"{index}S" }, new InlineKeyboardButton("Усыпить :(") { Text = $"Улучшить Ловкость", CallbackData = $"{index}L" } });
             IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("віаів") { Text = $"Улучшить Интелект", CallbackData = $"{index}I" } });
             
             var keybord = new InlineKeyboardMarkup(IKB);
             return keybord;
         }
+        //Заготовочка
+        public static IReplyMarkup CounterButtons(int index,int coif)
+        {
+            
+            List<List<InlineKeyboardButton>> IKB = new List<List<InlineKeyboardButton>>();
+            //IKB.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("іаів") { Text = $"+", CallbackData = $"{factor+1}" }, new InlineKeyboardButton("hfddf") { Text = $"{factor}", CallbackData = $"{factor}" }, new InlineKeyboardButton("hfddf") { Text = $"-", CallbackData = $"{factor-1}" } });
+            IKB.Add(new List<InlineKeyboardButton> {
+                new InlineKeyboardButton("12141") { Text = $"+", CallbackData = $"+coif" },
+                new InlineKeyboardButton("43243") { Text = $"{coif}", CallbackData = $"infocoif{coif}" },
+                new InlineKeyboardButton("42412") { Text = $"-", CallbackData = $"-coif" }});
+            
+            var keybord = new InlineKeyboardMarkup(IKB);
+            return keybord;
+        }
+
 
     }
 }
