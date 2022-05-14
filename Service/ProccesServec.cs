@@ -17,17 +17,27 @@ namespace ConsoleTestGI
                 Instance = new ProccesServec();      
             return Instance;            
         }
+        public void StartProces(string puthe)
+        {
+            Console.WriteLine($"Попытка запуска {puthe}");
+
+            process = Process.Start($@"{puthe}");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Запущен процесс BotDog");
+            Console.ForegroundColor = ConsoleColor.White;
+           
+        }
        public void StartServer()
         {
             Console.WriteLine("Попытка запуска");
             if (process == null)
             {
-            process = Process.Start(@"C:\MAMP\MAMP.exe");
+                process = Process.Start(@"C:\MAMP\MAMP.exe");
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Запущен процесс Сервера");
                 Console.ForegroundColor = ConsoleColor.White;
             }
-            
+
         }
         public void StopServer()
         {
