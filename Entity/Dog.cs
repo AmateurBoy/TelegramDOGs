@@ -81,7 +81,7 @@ namespace TelegramDOGs
             info += $"💡 Id:{id}\n";
             info += $"🐶 Имя:{name}\n";
             info += $"🐕🐩🐕‍Порода:{TypeDogString}\n";
-            info += $"⏰ Возраст:{TimeLifeDoginfo(age)}\n";
+            info += $"⏰ Возраст:{Math.Round(age)} Лет\n";
             info += $"🍽 Сытость:{Math.Round(satiety)}\n";
             info += $"🫀 Здоровье:{HP}\n";
             info += $"📈 Уровень:{lvl}\n";
@@ -142,6 +142,7 @@ namespace TelegramDOGs
             }
             return true;
         }
+        //Требует оптимизации создание точной формулы для вычесления.
         public string ConvertSecondDataTime(double second)
         {
 
@@ -211,6 +212,7 @@ namespace TelegramDOGs
             return info;
 
         }
+        //
         public void UpEndurance(int factor)
         {
             if(Endurance+Agility+Intelligence<lvl)

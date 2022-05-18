@@ -289,7 +289,7 @@ namespace TelegramDOGs
         {
             if(dog.isDead()==false)
             {
-                Console.WriteLine(dog.TimeLifeDoginfo(dog.age));
+                //Console.WriteLine(dog.TimeLifeDoginfo(dog.age));
                 MySqlCommand command = new MySqlCommand($"UPDATE `dogs` SET `age`=@age, `satiety`=@satiety, `hp`={dog.HP}, `lvl`={dog.lvl}, `Endurance`={dog.Endurance}, `Agility`={dog.Agility}, `Intelligence`={dog.Intelligence}, `userid`={dog.UserId},`regDoguser`=@DataUpdate WHERE `id`={dog.id}", DB.GetConnection());
                 command.Parameters.Add("@DataUpdate", MySqlDbType.DateTime).Value = DateTime.Now;
                 command.Parameters.Add("@age", MySqlDbType.Float).Value = dog.age;
